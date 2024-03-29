@@ -5,9 +5,10 @@ from src.client.cockroach import CockroachDBClient
 from src.db.service import DBservice
 from src.db.table.bank import Bank
 from src.db.table.credit_card import CreditCard
+from src.db.table.expenses import Expense
 from src.db.table.transaction import Transaction
 from src.db.table.user import User
-from src.schemas.income import ExpenseRequest, IncomeRequest
+from src.schemas.income import CreateTransactionRequest, ExpenseRequest, IncomeRequest
 from src.schemas.wallet import CreateBankRequest, CreateCreditCardRequest
 from src.utils.enums import HolderType
 
@@ -108,8 +109,34 @@ class AddService:
     def add_expense(
         cls, request: ExpenseRequest, cockroach_client: CockroachDBClient, user: User
     ):
-        if request.amount is not None and request.amount < 0:
+        if request.price < 0:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Expense amount cannot be negative",
+                detail="Expense price cannot be negative",
             )
+        expense: Expense = Expense(
+            user_id=user.id,
+            name=request.name,
+            amount=request.price,
+            remarks=request.remarks,
+        )
+        cockroach_client.queries(
+            fn=[Expense.add, DBservice.pay_transaction],
+            kwargs=[
+                {"items": [expense]},
+                {
+                    "to_account_type": HolderType.expense,
+                    "to_account_id": expense.id,
+                    "user": User,
+                    "cockroach_client": cockroach_client,
+                    "request": CreateTransactionRequest(
+                        amount=request.amount,
+                        remarks=request.remarks,
+                        from_account_id=request.from_account_id,
+                        from_credit_card_id=request.from_credit_card_id,
+                        from_loan=request.from_loan,
+                        from_emi=request.from_emi,
+                    ),
+                },
+            ],
+        )

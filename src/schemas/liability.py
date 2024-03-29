@@ -16,6 +16,7 @@ class CreateLoanRequest(BaseModel):
     name: str
     bank_name: str
     amount: float
+    to_account_id: UUID
     remarks: str | None = None
 
 
