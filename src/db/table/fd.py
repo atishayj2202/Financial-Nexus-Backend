@@ -13,8 +13,6 @@ class FD(DBSchemaBase):
     interest_rate: float
     duration: float
     sell_amount: float = 0.0
-    buy_transaction: UUID
-    sell_transaction: UUID | None = None
     remarks: str | None = None
 
     @classmethod

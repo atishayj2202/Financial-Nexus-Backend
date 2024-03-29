@@ -6,11 +6,12 @@ from src.db.service import DBservice
 from src.db.table.bank import Bank
 from src.db.table.credit_card import CreditCard
 from src.db.table.expenses import Expense
+from src.db.table.fd import FD
 from src.db.table.stock import Stock
 from src.db.table.transaction import Transaction
 from src.db.table.user import User
 from src.schemas.income import CreateTransactionRequest, ExpenseRequest, IncomeRequest, CreateTransferTransactionRequest
-from src.schemas.investment import CreateStockInvestementRequest
+from src.schemas.investment import CreateStockInvestementRequest, CreateFDRequest
 from src.schemas.wallet import CreateBankRequest, CreateCreditCardRequest
 from src.utils.enums import HolderType
 
@@ -134,6 +135,37 @@ class AddService:
                 {
                     "to_account_type": HolderType.stock,
                     "to_account_id": stock.id,
+                    "user": User,
+                    "cockroach_client": cockroach_client,
+                    "request": CreateTransactionRequest(
+                        amount=request.amount,
+                        remarks=request.remarks,
+                        from_account_id=request.from_account_id,
+                        from_credit_card_id=None,
+                        from_loan=None,
+                        from_emi=None,
+                    ),
+                },
+            ]
+        )
+
+    @classmethod
+    def add_fd(cls, request: CreateFDRequest, user: User, cockroach_client: CockroachDBClient):
+        fd : FD = FD(
+            user_id=user.id,
+            bank_name=request.bank_name,
+            amount=request.amount,
+            interest_rate=request.interest_rate,
+            duration=request.duration,
+            remarks=request.remarks,
+        )
+        cockroach_client.queries(
+            fn=[FD.add, DBservice.pay_transaction],
+            kwargs=[
+                {"items": [fd]},
+                {
+                    "to_account_type": HolderType.fd,
+                    "to_account_id": fd.id,
                     "user": User,
                     "cockroach_client": cockroach_client,
                     "request": CreateTransactionRequest(

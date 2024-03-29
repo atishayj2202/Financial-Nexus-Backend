@@ -35,6 +35,7 @@ class DisolveStockInvestmentRequest(BaseModel):
 
 class CreateFDRequest(BaseModel):
     amount: float
+    bank_name: str
     remarks: str | None = None
     from_account_id: UUID
     duration: int

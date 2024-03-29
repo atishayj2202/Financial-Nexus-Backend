@@ -5,7 +5,7 @@ from starlette.responses import Response
 from src.auth.user_auth import VerifiedUser, verify_user
 from src.client.cockroach import CockroachDBClient
 from src.schemas.income import ExpenseRequest, IncomeRequest
-from src.schemas.investment import CreateStockInvestementRequest
+from src.schemas.investment import CreateStockInvestementRequest, CreateFDRequest
 from src.schemas.wallet import CreateBankRequest, CreateCreditCardRequest
 from src.services.data_add import AddService
 from src.utils.client import getCockroachClient
@@ -17,7 +17,7 @@ ENDPOINT_ADD_CARD = "/add-card/"  # done
 ENDPOINT_ADD_INCOME = "/add-income/"  # done
 ENDPOINT_ADD_EXPENSE = "/add-expense/"  # done
 ENDPOINT_ADD_STOCKS = "/add-stocks/"  # done
-ENDPOINT_ADD_FD = "/add-fd/"  # pending
+ENDPOINT_ADD_FD = "/add-fd/"  # done
 ENDPOINT_ADD_ASSETS = "/add-assets/"  # pending
 ENDPOINT_ADD_LOAN = "/add-loan/"  # pending
 ENDPOINT_ADD_EMIS = "/add-emis/"  # pending
@@ -90,3 +90,17 @@ async def post_add_stocks(
         user=verified_user.request,
         cockroach_client=cockroach_client,
     )
+    return Response(status_code=status.HTTP_200_OK)
+
+@data_add_router.post(ENDPOINT_ADD_FD)
+async def post_add_fd(
+    request: CreateFDRequest,
+    verified_user: VerifiedUser = Depends(verify_user),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+):
+    AddService.add_fd(
+        request=request,
+        user=verified_user.request,
+        cockroach_client=cockroach_client,
+    )
+    return Response(status_code=status.HTTP_200_OK)

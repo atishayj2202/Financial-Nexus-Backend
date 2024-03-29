@@ -10,8 +10,6 @@ CREATE TABLE fds
     interest_rate    NUMERIC     DEFAULT 0,
     duration         NUMERIC     DEFAULT 0,
     sell_amount      NUMERIC     DEFAULT 0,
-    buy_transaction  UUID NOT NULL UNIQUE,
-    sell_transaction UUID DEFAULT NULL,
     remarks          TEXT,
     FOREIGN KEY (user_id) REFERENCES user_accounts (id)
 );
