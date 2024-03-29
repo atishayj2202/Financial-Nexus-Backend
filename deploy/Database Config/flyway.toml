@@ -1,0 +1,28 @@
+databaseType = "PostgreSql"
+id = "828227aa-28c9-4bf2-82f0-58858ce8f52e"
+name = "Financial Nexus"
+
+[flyway]
+locations = [ "filesystem:migrations" ]
+mixed = true
+outOfOrder = true
+validateMigrationNaming = true
+
+  [flyway.check]
+  majorTolerance = 0
+
+[flywayDesktop]
+developmentEnvironment = "development"
+schemaModel = "schema-model"
+shadowEnvironment = "shadow"
+
+[redgateCompare]
+filterFile = "filter.rgf"
+
+[redgateCompare.postgresql.options.ignores]
+ignoreNewlinesInTextObjects = "off"
+
+[environments.target1]
+url = "jdbc:postgresql://database-server-atishay.postgres.database.azure.com:5432/financial-nexus"
+schemas = [ "public" ]
+displayName = "Azure PostgreSQL"
