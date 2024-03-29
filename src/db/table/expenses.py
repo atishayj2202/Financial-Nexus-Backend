@@ -5,18 +5,16 @@ from uuid import UUID
 from src.db.base import Base, DBSchemaBase
 
 
-class Loan(DBSchemaBase):
+class Expense(DBSchemaBase):
     user_id: UUID
     name: str
-    bank_name: str
+    amount: float
     disabled: datetime | None = None
-    pending: float
-    total_amount: float
     remarks: str | None = None
 
     @classmethod
     def _schema_cls(cls) -> Type[Base]:
-        return _Loan
+        return _Expense
 
 
-_Loan = Base.from_schema_base(Loan, "loans")
+_Expense = Base.from_schema_base(Expense, "expenses")

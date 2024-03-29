@@ -1,17 +1,15 @@
-CREATE TABLE loans
+CREATE TABLE expenses
 (
     id               UUID PRIMARY KEY,
     created_at       TIMESTAMPTZ DEFAULT now()::TIMESTAMPTZ,
     last_modified_at TIMESTAMPTZ DEFAULT now()::TIMESTAMPTZ,
     user_id          UUID    NOT NULL,
     name             VARCHAR NOT NULL,
-    bank_name        VARCHAR NOT NULL,
     disabled         TIMESTAMPTZ DEFAULT NULL,
-    pending          NUMERIC     DEFAULT 0,
-    total_amount     NUMERIC     DEFAULT 0,
+    amount           NUMERIC NOT NULL,
     remarks          TEXT,
     FOREIGN KEY (user_id) REFERENCES user_accounts (id)
 );
 
-CREATE INDEX loan_id ON loans (id);
-CREATE INDEX loan_user_id ON loans (user_id);
+CREATE INDEX expense_id ON expenses (id);
+CREATE INDEX expense_user_id ON expenses (user_id);
