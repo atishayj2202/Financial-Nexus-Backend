@@ -6,9 +6,11 @@ from src.db.service import DBservice
 from src.db.table.bank import Bank
 from src.db.table.credit_card import CreditCard
 from src.db.table.expenses import Expense
+from src.db.table.stock import Stock
 from src.db.table.transaction import Transaction
 from src.db.table.user import User
-from src.schemas.income import CreateTransactionRequest, ExpenseRequest, IncomeRequest
+from src.schemas.income import CreateTransactionRequest, ExpenseRequest, IncomeRequest, CreateTransferTransactionRequest
+from src.schemas.investment import CreateStockInvestementRequest
 from src.schemas.wallet import CreateBankRequest, CreateCreditCardRequest
 from src.utils.enums import HolderType
 
@@ -66,43 +68,17 @@ class AddService:
         cockroach_client: CockroachDBClient,
         user: User,
     ):
-        if request.amount < 0:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Income amount cannot be negative",
-            )
-        bank: Bank = cockroach_client.query(
-            Bank.get_id,
-            id=request.bank_id,
-            error_not_exist=False,
-        )
-        if bank is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Bank not found",
-            )
-        if bank.user_id != user.id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Bank not belong to user",
-            )
-        cockroach_client.queries(
-            fn=[Transaction.add, DBservice.update_bank_balance],
-            kwargs=[
-                {
-                    "items": [
-                        Transaction(
-                            user_id=user.id,
-                            from_account_type=HolderType.income,
-                            to_account_id=bank.id,
-                            to_account_type=HolderType.bank,
-                            amount=request.amount,
-                            remarks=request.remarks,
-                        )
-                    ]
-                },
-                {"id": bank.id, "amount": request.amount},
-            ],
+        cockroach_client.query(
+            DBservice.get_transaction,
+            cockroach_client=cockroach_client,
+            request=CreateTransferTransactionRequest(
+                amount=request.amount,
+                remarks=request.remarks,
+                to_account_id=request.to_account_id,
+            ),
+            user=user,
+            from_account_id=None,
+            from_account_type=HolderType.income,
         )
 
     @classmethod
@@ -139,4 +115,35 @@ class AddService:
                     ),
                 },
             ],
+        )
+
+    @classmethod
+    def add_stock(cls, request: CreateStockInvestementRequest, user: User, cockroach_client: CockroachDBClient):
+        stock = Stock(
+            user_id=user.id,
+            symbol=request.symbol,
+            amount=request.quantity,
+            buy_price=request.amount/request.quantity,
+            price=request.price,
+            remarks=request.remarks,
+        )
+        cockroach_client.queries(
+            fn=[Stock.add, DBservice.pay_transaction],
+            kwargs=[
+                {"items": [stock]},
+                {
+                    "to_account_type": HolderType.stock,
+                    "to_account_id": stock.id,
+                    "user": User,
+                    "cockroach_client": cockroach_client,
+                    "request": CreateTransactionRequest(
+                        amount=request.amount,
+                        remarks=request.remarks,
+                        from_account_id=request.from_account_id,
+                        from_credit_card_id=None,
+                        from_loan=None,
+                        from_emi=None,
+                    ),
+                },
+            ]
         )

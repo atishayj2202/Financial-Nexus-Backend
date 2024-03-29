@@ -13,8 +13,6 @@ class Stock(DBSchemaBase):
     buy_price: float
     avg_sell_price: float = 0.0
     already_sold: float = 0.0
-    buy_transaction: UUID
-    sell_transactions: List[UUID] = []
     remarks: str | None = None
 
     @classmethod
