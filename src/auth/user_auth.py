@@ -15,7 +15,6 @@ class VerifiedUser(BaseModel):
     requesting_user: User
 
 
-
 def verify_user(
     authorization: str = Header(...),
     cockroach_client: CockroachDBClient = Depends(getCockroachClient),
