@@ -7,6 +7,7 @@ from starlette.responses import Response
 from src.auth.user_auth import VerifiedUser, verify_user
 from src.client.cockroach import CockroachDBClient
 from src.client.firebase import FirebaseClient
+from src.schemas.income import IncomeRequest
 from src.schemas.user import (
     RatingRequest,
     UserCreateRequest,
@@ -116,6 +117,19 @@ async def post_add_card(
     cockroach_client: CockroachDBClient = Depends(getCockroachClient),
 ):
     UserService.add_bank(
+        request=request,
+        user=verified_user.requesting_user,
+        cockroach_client=cockroach_client,
+    )
+
+
+@user_router.post(ENDPOINT_ADD_INCOME)
+async def post_add_income(
+    request: IncomeRequest,
+    verified_user: VerifiedUser = Depends(verify_user),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+):
+    UserService.add_income(
         request=request,
         user=verified_user.requesting_user,
         cockroach_client=cockroach_client,

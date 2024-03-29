@@ -7,10 +7,13 @@ from starlette import status
 
 from src.client.cockroach import CockroachDBClient
 from src.client.firebase import FirebaseClient
+from src.db.service import DBservice
 from src.db.table.bank import Bank
 from src.db.table.credit_card import CreditCard
 from src.db.table.feedback import Feedback
+from src.db.table.transaction import Transaction
 from src.db.table.user import User
+from src.schemas.income import IncomeRequest
 from src.schemas.user import (
     RatingRequest,
     UserCreateRequest,
@@ -18,6 +21,7 @@ from src.schemas.user import (
     UserUpdateRequest,
 )
 from src.schemas.wallet import CreateBankRequest, CreateCreditCardRequest
+from src.utils.enums import HolderType
 
 
 class UserService:
@@ -164,6 +168,7 @@ class UserService:
             items=[bank],
         )
 
+    @classmethod
     def add_card(
         cls,
         request: CreateCreditCardRequest,
@@ -185,4 +190,50 @@ class UserService:
         cockroach_client.query(
             CreditCard.add,
             items=[card],
+        )
+
+    @classmethod
+    def add_income(
+        cls,
+        request: IncomeRequest,
+        cockroach_client: CockroachDBClient,
+        user: User,
+    ):
+        if request.amount < 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Income amount cannot be negative",
+            )
+        bank: Bank = cockroach_client.query(
+            Bank.get_id,
+            id=request.bank_id,
+            error_not_exist=False,
+        )
+        if bank is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Bank not found",
+            )
+        if bank.user_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Bank not belong to user",
+            )
+        cockroach_client.queries(
+            fn=[Transaction.add, DBservice.update_bank_balance],
+            kwargs=[
+                {
+                    "items": [
+                        Transaction(
+                            user_id=user.id,
+                            from_account_type=HolderType.income,
+                            to_account_id=bank.id,
+                            to_account_type=HolderType.bank,
+                            amount=request.amount,
+                            remarks=request.remarks,
+                        )
+                    ]
+                },
+                {"id": bank.id, "amount": request.amount},
+            ],
         )
