@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Type, List
+from typing import List, Type
 from uuid import UUID
 
 from src.db.base import Base, DBSchemaBase

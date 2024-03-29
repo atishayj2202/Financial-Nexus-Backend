@@ -9,6 +9,7 @@ class AuthType(Enum):
     email = "email"
     phone = "phone"
 
+
 class HolderType(Enum):
     bank = "bank"
     credit_card = "credit_card"

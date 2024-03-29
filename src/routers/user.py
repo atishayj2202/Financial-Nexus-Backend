@@ -25,6 +25,7 @@ ENDPOINT_FIND_USER_BY_ID = "/{user_id}/fetch-user-by-id/"  # done
 ENDPOINT_ADD_FEEDBACK = "/add-feedback/"  # done
 ENDPOINT_UPDATE_USER = "/update-user/"  # done
 ENDPOINT_GET_THREADS = "/get-threads/"  # done
+ENDPOINT_ADD_BANK = "/add-bank/"  # pending
 
 
 @user_router.post(ENDPOINT_CREATE_USER)
@@ -90,4 +91,3 @@ async def post_update_user(
         cockroach_client=cockroach_client,
     )
     return Response(status_code=status.HTTP_200_OK)
-
