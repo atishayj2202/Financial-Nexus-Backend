@@ -1,19 +1,19 @@
 import yfinance as yf
 from starlette.exceptions import HTTPException
 
-from src.schemas.investment import StockResponse
+from src.schemas.investment import StockSymbolResponse
 
 
 class stockClient:
     @classmethod
-    def get_stock_data(cls, symbol: str) -> StockResponse:
+    def get_stock_data(cls, symbol: str) -> StockSymbolResponse:
         data = yf.Ticker(symbol).info
         if "open" not in data:
             data = yf.Ticker(symbol + ".NS").info
         if "open" not in data:
             data = yf.Ticker(symbol + ".BO").info
         try:
-            return StockResponse(
+            return StockSymbolResponse(
                 name=data["longName"],
                 currency=data["financialCurrency"]
                 if "financialCurrency" in data

@@ -7,6 +7,8 @@ from starlette.responses import Response
 from src.auth.user_auth import VerifiedUser, verify_user
 from src.client.cockroach import CockroachDBClient
 from src.client.firebase import FirebaseClient
+from src.client.stock import stockClient
+from src.schemas.investment import StockSymbolResponse
 from src.schemas.user import (
     RatingRequest,
     UserCreateRequest,
@@ -24,6 +26,7 @@ ENDPOINT_GET_USER = "/get-user/"  # done
 ENDPOINT_FIND_USER_BY_ID = "/{user_id}/fetch-user-by-id/"  # done
 ENDPOINT_ADD_FEEDBACK = "/add-feedback/"  # done
 ENDPOINT_UPDATE_USER = "/update-user/"  # done
+ENDPOINT_GET_STOCK_DATA = "/get-stock-data/{stock_symbol}/"  # done
 
 
 @user_router.post(ENDPOINT_CREATE_USER)
@@ -89,3 +92,8 @@ async def post_update_user(
         cockroach_client=cockroach_client,
     )
     return Response(status_code=status.HTTP_200_OK)
+
+
+@user_router.get(ENDPOINT_GET_STOCK_DATA, response_model=StockSymbolResponse)
+async def get_stock_data(stock_symbol: str):
+    return stockClient.get_stock_data(stock_symbol)
