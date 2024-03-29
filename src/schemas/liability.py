@@ -29,6 +29,7 @@ class LoanResponse(BaseModel):
     remarks: str | None = None
     disabled: datetime | None = None
 
+
 class EMIResponse(BaseModel):
     id: UUID
     created_at: datetime

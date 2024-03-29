@@ -7,6 +7,8 @@ from starlette import status
 
 from src.client.cockroach import CockroachDBClient
 from src.client.firebase import FirebaseClient
+from src.db.table.bank import Bank
+from src.db.table.credit_card import CreditCard
 from src.db.table.feedback import Feedback
 from src.db.table.user import User
 from src.schemas.user import (
@@ -15,6 +17,7 @@ from src.schemas.user import (
     UserResponse,
     UserUpdateRequest,
 )
+from src.schemas.wallet import CreateBankRequest, CreateCreditCardRequest
 
 
 class UserService:
@@ -139,3 +142,47 @@ class UserService:
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
             )
         return cls.fetch_user(user)
+
+    @classmethod
+    def add_bank(
+        cls, request: CreateBankRequest, cockroach_client: CockroachDBClient, user: User
+    ):
+        if request.opening_balance < 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Opening balance cannot be negative",
+            )
+        bank: Bank = Bank(
+            user_id=user.id,
+            name=request.name,
+            bank_name=request.bank_name,
+            balance=request.opening_balance,
+            remarks=request.remarks,
+        )
+        cockroach_client.query(
+            Bank.add,
+            items=[bank],
+        )
+
+    def add_card(
+        cls,
+        request: CreateCreditCardRequest,
+        cockroach_client: CockroachDBClient,
+        user: User,
+    ):
+        if request.card_limit < 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Card limit cannot be negative",
+            )
+        card: CreditCard = CreditCard(
+            user_id=user.id,
+            name=request.name,
+            card_name=request.card_name,
+            remarks=request.remarks,
+            credit_limit=request.card_limit,
+        )
+        cockroach_client.query(
+            CreditCard.add,
+            items=[card],
+        )
