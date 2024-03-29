@@ -2,6 +2,8 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
+from src.schemas.liability import CreateLoanRequest, CreateEMIRequest
+
 
 class StockSymbolResponse(BaseModel):
     name: str
@@ -40,3 +42,14 @@ class CreateFDRequest(BaseModel):
     from_account_id: UUID
     duration: int
     interest_rate: float
+
+
+class CreateAssetRequest(BaseModel):
+    name: str
+    price: float
+    amount: float | None = None
+    remarks: str | None = None
+    from_account_id: UUID | None = None
+    from_credit_card_id: UUID | None = None
+    from_loan: CreateLoanRequest | None = None
+    from_emi: CreateEMIRequest | None = None

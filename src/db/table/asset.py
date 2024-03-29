@@ -11,8 +11,6 @@ class Asset(DBSchemaBase):
     disabled: datetime | None = None
     amount: float
     sell_price: float = 0.0
-    buy_transaction: UUID
-    sell_transaction: UUID | None = None
     remarks: str | None = None
 
     @classmethod

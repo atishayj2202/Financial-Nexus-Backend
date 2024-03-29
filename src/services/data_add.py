@@ -3,6 +3,7 @@ from starlette.exceptions import HTTPException
 
 from src.client.cockroach import CockroachDBClient
 from src.db.service import DBservice
+from src.db.table.asset import Asset
 from src.db.table.bank import Bank
 from src.db.table.credit_card import CreditCard
 from src.db.table.expenses import Expense
@@ -11,7 +12,7 @@ from src.db.table.stock import Stock
 from src.db.table.transaction import Transaction
 from src.db.table.user import User
 from src.schemas.income import CreateTransactionRequest, ExpenseRequest, IncomeRequest, CreateTransferTransactionRequest
-from src.schemas.investment import CreateStockInvestementRequest, CreateFDRequest
+from src.schemas.investment import CreateStockInvestementRequest, CreateFDRequest, CreateAssetRequest
 from src.schemas.wallet import CreateBankRequest, CreateCreditCardRequest
 from src.utils.enums import HolderType
 
@@ -178,4 +179,40 @@ class AddService:
                     ),
                 },
             ]
+        )
+
+    @classmethod
+    def add_asset(
+            cls, request: CreateAssetRequest, cockroach_client: CockroachDBClient, user: User
+    ):
+        if request.price < 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Expense price cannot be negative",
+            )
+        asset: Asset = Asset(
+            user_id=user.id,
+            name=request.name,
+            amount=request.price,
+            remarks=request.remarks,
+        )
+        cockroach_client.queries(
+            fn=[Expense.add, DBservice.pay_transaction],
+            kwargs=[
+                {"items": [asset]},
+                {
+                    "to_account_type": HolderType.asset,
+                    "to_account_id": asset.id,
+                    "user": User,
+                    "cockroach_client": cockroach_client,
+                    "request": CreateTransactionRequest(
+                        amount=request.amount,
+                        remarks=request.remarks,
+                        from_account_id=request.from_account_id,
+                        from_credit_card_id=request.from_credit_card_id,
+                        from_loan=request.from_loan,
+                        from_emi=request.from_emi,
+                    ),
+                },
+            ],
         )
