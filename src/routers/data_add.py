@@ -5,7 +5,12 @@ from starlette.responses import Response
 from src.auth.user_auth import VerifiedUser, verify_user
 from src.client.cockroach import CockroachDBClient
 from src.schemas.income import ExpenseRequest, IncomeRequest
-from src.schemas.investment import CreateStockInvestementRequest, CreateFDRequest, CreateAssetRequest
+from src.schemas.investment import (
+    CreateAssetRequest,
+    CreateFDRequest,
+    CreateStockInvestementRequest,
+)
+from src.schemas.liability import CreateEMIRequest, CreateLoanRequest
 from src.schemas.wallet import CreateBankRequest, CreateCreditCardRequest
 from src.services.data_add import AddService
 from src.utils.client import getCockroachClient
@@ -92,6 +97,7 @@ async def post_add_stocks(
     )
     return Response(status_code=status.HTTP_200_OK)
 
+
 @data_add_router.post(ENDPOINT_ADD_FD)
 async def post_add_fd(
     request: CreateFDRequest,
@@ -105,6 +111,7 @@ async def post_add_fd(
     )
     return Response(status_code=status.HTTP_200_OK)
 
+
 @data_add_router.post(ENDPOINT_ADD_ASSETS)
 async def post_add_assets(
     request: CreateAssetRequest,
@@ -112,6 +119,34 @@ async def post_add_assets(
     cockroach_client: CockroachDBClient = Depends(getCockroachClient),
 ):
     AddService.add_asset(
+        request=request,
+        user=verified_user.requesting_user,
+        cockroach_client=cockroach_client,
+    )
+    return Response(status_code=status.HTTP_200_OK)
+
+
+@data_add_router.post(ENDPOINT_ADD_LOAN)
+async def post_add_loan(
+    request: CreateLoanRequest,
+    verified_user: VerifiedUser = Depends(verify_user),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+):
+    AddService.add_loan(
+        request=request,
+        user=verified_user.requesting_user,
+        cockroach_client=cockroach_client,
+    )
+    return Response(status_code=status.HTTP_200_OK)
+
+
+@data_add_router.post(ENDPOINT_ADD_EMIS)
+async def post_add_emis(
+    request: CreateEMIRequest,
+    verified_user: VerifiedUser = Depends(verify_user),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+):
+    AddService.add_emi(
         request=request,
         user=verified_user.requesting_user,
         cockroach_client=cockroach_client,

@@ -2,7 +2,7 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from src.schemas.liability import CreateLoanRequest, CreateEMIRequest
+from src.schemas.liability import CreateEMIRequest, CreateLoanRequest
 
 
 class StockSymbolResponse(BaseModel):

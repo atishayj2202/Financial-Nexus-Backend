@@ -10,13 +10,14 @@ class CreateEMIRequest(BaseModel):
     monthly: float
     total_time: int
     remarks: str | None = None
+    to_account_id: UUID | None = None
 
 
 class CreateLoanRequest(BaseModel):
     name: str
     bank_name: str
     amount: float
-    to_account_id: UUID
+    to_account_id: UUID | None = None
     remarks: str | None = None
 
 
