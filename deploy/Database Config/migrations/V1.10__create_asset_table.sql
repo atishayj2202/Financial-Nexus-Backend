@@ -8,6 +8,8 @@ CREATE TABLE assets
     disabled         TIMESTAMPTZ DEFAULT NULL,
     amount           NUMERIC     DEFAULT 0,
     sell_price       NUMERIC     DEFAULT 0,
+    buy_transaction  UUID NOT NULL UNIQUE,
+    sell_transaction UUID DEFAULT NULL,
     remarks          TEXT,
     FOREIGN KEY (user_id) REFERENCES user_accounts (id)
 );
