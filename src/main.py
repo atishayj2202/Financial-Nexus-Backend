@@ -8,6 +8,7 @@ from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoin
 from starlette.requests import Request
 from starlette.responses import Response
 
+from src.routers.data_add import data_add_router
 from src.routers.user import user_router
 from utils.client import getCockroachClient, getFirebaseClient
 
@@ -65,6 +66,7 @@ async def error_middleware(request: Request, call_next):
 
 app.add_event_handler("startup", startup_event)
 app.include_router(user_router)
+app.include_router(data_add_router)
 
 if __name__ == "__main__":
     import uvicorn
