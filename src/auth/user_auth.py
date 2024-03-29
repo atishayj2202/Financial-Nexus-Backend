@@ -1,10 +1,8 @@
-from uuid import UUID
-
 from fastapi import Depends, Header, HTTPException
 from pydantic import BaseModel
 from starlette import status
 
-from src.auth.base import _get_requesting_user, get_user_from_token
+from src.auth.base import _get_requesting_user
 from src.client.cockroach import CockroachDBClient
 from src.client.firebase import FirebaseClient
 from src.db.table.user import User
@@ -26,10 +24,3 @@ def verify_user(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
     return VerifiedUser(requesting_user=user)
-
-
-def verify_is_user(
-    authorization: str = Header(...),
-    firebase_client: FirebaseClient = Depends(getFirebaseClient),
-) -> str:
-    return get_user_from_token(firebase_client, authorization)
