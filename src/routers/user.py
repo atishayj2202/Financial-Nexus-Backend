@@ -28,7 +28,7 @@ ENDPOINT_ADD_FEEDBACK = "/add-feedback/"  # done
 ENDPOINT_UPDATE_USER = "/update-user/"  # done
 ENDPOINT_ADD_BANK = "/add-bank/"  # done
 ENDPOINT_ADD_CARD = "/add-card/"  # done
-ENDPOINT_ADD_INCOME = "/add-income/"  # pending
+ENDPOINT_ADD_INCOME = "/add-income/"  # done
 ENDPOINT_ADD_EXPENSE = "/add-expense/"  # pending
 
 
@@ -108,6 +108,7 @@ async def post_add_bank(
         user=verified_user.requesting_user,
         cockroach_client=cockroach_client,
     )
+    return Response(status_code=status.HTTP_200_OK)
 
 
 @user_router.post(ENDPOINT_ADD_CARD)
@@ -121,6 +122,7 @@ async def post_add_card(
         user=verified_user.requesting_user,
         cockroach_client=cockroach_client,
     )
+    return Response(status_code=status.HTTP_200_OK)
 
 
 @user_router.post(ENDPOINT_ADD_INCOME)
@@ -134,3 +136,4 @@ async def post_add_income(
         user=verified_user.requesting_user,
         cockroach_client=cockroach_client,
     )
+    return Response(status_code=status.HTTP_200_OK)
