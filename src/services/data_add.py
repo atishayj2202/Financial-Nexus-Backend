@@ -259,7 +259,7 @@ class AddService:
                     "user": user,
                     "cockroach_client": cockroach_client,
                     "request": CreateTransactionRequest(
-                        amount=request.amount,
+                        amount=None,
                         remarks=request.remarks,
                         from_account_id=None,
                         from_credit_card_id=None,

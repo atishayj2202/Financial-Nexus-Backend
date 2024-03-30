@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 
 class CreateEMIRequest(BaseModel):
+    amount: float | None = None
     name: str
     bank_name: str
     monthly: float
