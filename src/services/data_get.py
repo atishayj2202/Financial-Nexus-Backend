@@ -14,9 +14,9 @@ from src.db.table.loan import Loan
 from src.db.table.stock import Stock
 from src.db.table.transaction import Transaction
 from src.db.table.user import User
-from src.schemas.user import TransactionResponse
 from src.schemas.investment import AssetResponse, FDResponse, StockResponse
 from src.schemas.liability import EMIResponse, LoanResponse
+from src.schemas.user import TransactionResponse
 from src.schemas.wallet import BankResponse, CreditCardResponse
 from src.utils.enums import HolderType
 
@@ -328,7 +328,7 @@ class GetService:
     @classmethod
     def get_emi(
         cls, id: UUID, user: User, cockroach_client: CockroachDBClient
-    ) -> list[EMIResponse]:
+    ) -> EMIResponse:
         emi: EMI = cockroach_client.query(
             EMI.get_by_multiple_field_unique,
             fields=["id", "user_id"],
@@ -344,22 +344,20 @@ class GetService:
             DBservice.get_transactions,
             id=emi.id,
         )
-        return [
-            EMIResponse(
-                id=emi.id,
-                created_at=emi.created_at,
-                name=emi.name,
-                bank_name=emi.bank_name,
-                monthly=emi.monthly,
-                pending=emi.pending,
-                total_time=emi.total_time,
-                disabled=emi.disabled,
-                remarks=emi.remarks,
-                transactions=[
-                    cls.evaluateTransaction(transaction) for transaction in transactions
-                ],
-            )
-        ]
+        return EMIResponse(
+            id=emi.id,
+            created_at=emi.created_at,
+            name=emi.name,
+            bank_name=emi.bank_name,
+            monthly=emi.monthly,
+            pending=emi.pending,
+            total_time=emi.total_time,
+            disabled=emi.disabled,
+            remarks=emi.remarks,
+            transactions=[
+                cls.evaluateTransaction(transaction) for transaction in transactions
+            ],
+        )
 
     @classmethod
     def get_loan(

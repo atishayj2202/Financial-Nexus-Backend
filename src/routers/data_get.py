@@ -4,9 +4,9 @@ from fastapi import APIRouter, Depends
 
 from src.auth.user_auth import VerifiedUser, verify_user
 from src.client.cockroach import CockroachDBClient
-from src.schemas.user import TransactionResponse
 from src.schemas.investment import AssetResponse, FDResponse, StockResponse
 from src.schemas.liability import EMIResponse, LoanResponse
+from src.schemas.user import TransactionResponse
 from src.schemas.wallet import BankResponse, CreditCardResponse
 from src.services.data_get import GetService
 from src.utils.client import getCockroachClient
@@ -186,6 +186,19 @@ async def get_asset(
 ):
     return GetService.get_asset(
         id=asset_id,
+        user=verified_user.requesting_user,
+        cockroach_client=cockroach_client,
+    )
+
+
+@data_get_router.get(ENDPOINT_GET_STOCK, response_model=StockResponse)
+async def get_stock(
+    stock_id: UUID,
+    verified_user: VerifiedUser = Depends(verify_user),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+):
+    return GetService.get_stock(
+        id=stock_id,
         user=verified_user.requesting_user,
         cockroach_client=cockroach_client,
     )

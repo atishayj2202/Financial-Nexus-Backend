@@ -3,8 +3,8 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from src.schemas.user import TransactionResponse
 from src.schemas.liability import CreateEMIRequest, CreateLoanRequest
+from src.schemas.user import TransactionResponse
 
 
 class StockSymbolResponse(BaseModel):
