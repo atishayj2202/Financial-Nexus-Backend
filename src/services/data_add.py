@@ -109,6 +109,7 @@ class AddService:
             amount=request.price,
             remarks=request.remarks,
         )
+
         cockroach_client.queries(
             fn=[Expense.add, DBservice.pay_transaction],
             kwargs=[
@@ -119,7 +120,7 @@ class AddService:
                     "user": user,
                     "cockroach_client": cockroach_client,
                     "request": CreateTransactionRequest(
-                        amount=request.amount,
+                        amount=request.amount ,
                         remarks=request.remarks,
                         from_account_id=request.from_account_id,
                         from_credit_card_id=request.from_credit_card_id,

@@ -24,8 +24,8 @@ ENDPOINT_ADD_EXPENSE = "/add-expense/"  # done
 ENDPOINT_ADD_STOCKS = "/add-stocks/"  # done
 ENDPOINT_ADD_FD = "/add-fd/"  # done
 ENDPOINT_ADD_ASSETS = "/add-assets/"  # done
-ENDPOINT_ADD_LOAN = "/add-loan/"  # pending
-ENDPOINT_ADD_EMIS = "/add-emis/"  # pending
+ENDPOINT_ADD_LOAN = "/add-loan/"  # done
+ENDPOINT_ADD_EMIS = "/add-emis/"  # done
 
 
 @data_add_router.post(ENDPOINT_ADD_BANK)
@@ -48,7 +48,7 @@ async def post_add_card(
     verified_user: VerifiedUser = Depends(verify_user),
     cockroach_client: CockroachDBClient = Depends(getCockroachClient),
 ):
-    AddService.add_bank(
+    AddService.add_card(
         request=request,
         user=verified_user.requesting_user,
         cockroach_client=cockroach_client,

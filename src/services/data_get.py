@@ -38,6 +38,7 @@ class GetService:
             for bank in banks
         ]
 
+    @classmethod
     def get_cards(
         cls, user: User, cockroach_client: CockroachDBClient
     ) -> list[CreditCardResponse]:
