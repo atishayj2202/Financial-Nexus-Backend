@@ -4,6 +4,7 @@ from uuid import UUID
 from pydantic import BaseModel
 
 from src.schemas.liability import CreateEMIRequest, CreateLoanRequest
+from src.schemas.user import TransactionResponse
 
 
 class IncomeRequest(BaseModel):
@@ -39,3 +40,12 @@ class CreateTransferTransactionRequest(BaseModel):
     to_credit_card_id: UUID | None = None
     to_loan_id: UUID | None = None
     to_emi_id: UUID | None = None
+
+
+class ExpenseResponse(BaseModel):
+    id: UUID
+    created_at: datetime
+    name: str
+    price: float
+    remarks: str | None = None
+    transactions: list[TransactionResponse] | None = None

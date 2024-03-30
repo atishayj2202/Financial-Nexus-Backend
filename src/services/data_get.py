@@ -9,11 +9,13 @@ from src.db.table.asset import Asset
 from src.db.table.bank import Bank
 from src.db.table.credit_card import CreditCard
 from src.db.table.emi import EMI
+from src.db.table.expenses import Expense
 from src.db.table.fd import FD
 from src.db.table.loan import Loan
 from src.db.table.stock import Stock
 from src.db.table.transaction import Transaction
 from src.db.table.user import User
+from src.schemas.income import ExpenseResponse
 from src.schemas.investment import AssetResponse, FDResponse, StockResponse
 from src.schemas.liability import EMIResponse, LoanResponse
 from src.schemas.user import TransactionResponse
@@ -485,6 +487,36 @@ class GetService:
             sell_price=asset.sell_price,
             remarks=asset.remarks,
             disabled=asset.disabled,
+            transactions=[
+                cls.evaluateTransaction(transaction) for transaction in transactions
+            ],
+        )
+
+    @classmethod
+    def get_expense(
+        cls, user: User, cockroach_client: CockroachDBClient, id: UUID
+    ) -> ExpenseResponse:
+        expense: Expense = cockroach_client.query(
+            Expense.get_by_multiple_field_unique,
+            fields=["id", "user_id"],
+            match_values=[id, user.id],
+            error_not_exist=False,
+        )
+        if expense is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Expense not found",
+            )
+        transactions: list[Transaction] = cockroach_client.query(
+            DBservice.get_transactions,
+            id=expense.id,
+        )
+        return ExpenseResponse(
+            id=expense.id,
+            created_at=expense.created_at,
+            name=expense.name,
+            price=expense.amount,
+            remarks=expense.remarks,
             transactions=[
                 cls.evaluateTransaction(transaction) for transaction in transactions
             ],

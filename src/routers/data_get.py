@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends
 
 from src.auth.user_auth import VerifiedUser, verify_user
 from src.client.cockroach import CockroachDBClient
+from src.schemas.income import ExpenseResponse
 from src.schemas.investment import AssetResponse, FDResponse, StockResponse
 from src.schemas.liability import EMIResponse, LoanResponse
 from src.schemas.user import TransactionResponse
@@ -28,7 +29,7 @@ ENDPOINT_GET_FD = "/{fd_id}/get-fd/"  # done
 ENDPOINT_GET_ASSET = "/{asset_id}/get-asset/"  # done
 ENDPOINT_GET_LOAN = "/{loan_id}/get-loan/"  # done
 ENDPOINT_GET_EMI = "/{emi_id}/get-emi/"  # done
-ENDPOINT_GET_EXPENSE = "/{expense_id}/get-expense/"  # pending
+ENDPOINT_GET_EXPENSE = "/{expense_id}/get-expense/"  # done
 
 
 @data_get_router.get(
@@ -199,6 +200,19 @@ async def get_stock(
 ):
     return GetService.get_stock(
         id=stock_id,
+        user=verified_user.requesting_user,
+        cockroach_client=cockroach_client,
+    )
+
+
+@data_get_router.get(ENDPOINT_GET_EXPENSE, response_model=ExpenseResponse)
+def get_expense(
+    expense_id: UUID,
+    verified_user: VerifiedUser = Depends(verify_user),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+):
+    return GetService.get_expense(
+        id=expense_id,
         user=verified_user.requesting_user,
         cockroach_client=cockroach_client,
     )
