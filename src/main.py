@@ -9,6 +9,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from src.routers.data_add import data_add_router
+from src.routers.data_edit import data_edit_router
 from src.routers.data_get import data_get_router
 from src.routers.user import user_router
 from src.utils.client import getCockroachClient, getFirebaseClient
@@ -69,6 +70,7 @@ app.add_event_handler("startup", startup_event)
 app.include_router(user_router)
 app.include_router(data_add_router)
 app.include_router(data_get_router)
+app.include_router(data_edit_router)
 
 if __name__ == "__main__":
     import uvicorn
