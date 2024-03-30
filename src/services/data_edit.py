@@ -4,11 +4,15 @@ from starlette import status
 from starlette.exceptions import HTTPException
 
 from src.client.cockroach import CockroachDBClient
+from src.db.service import DBservice
 from src.db.table.bank import Bank
 from src.db.table.credit_card import CreditCard
 from src.db.table.emi import EMI
 from src.db.table.loan import Loan
 from src.db.table.user import User
+from src.schemas.income import CreateTransferTransactionRequest
+from src.schemas.payment import PaymentRequest
+from src.utils.enums import HolderType
 from src.utils.time import get_current_time
 
 
@@ -137,4 +141,103 @@ class EditService:
             EMI.update_by_id,
             new_data=emi,
             id=emi.id,
+        )
+
+    @classmethod
+    def pay_emi(
+        cls,
+        emi_id: UUID,
+        user: User,
+        cockroach_client: CockroachDBClient,
+        request: PaymentRequest,
+    ):
+        cockroach_client.queries(
+            fn=[DBservice.get_transaction, DBservice.update_bank_balance],
+            kwargs=[
+                {
+                    "from_account_type": HolderType.fd,
+                    "from_account_id": request.from_account_id,
+                    "user": user,
+                    "cockroach_client": cockroach_client,
+                    "request": CreateTransferTransactionRequest(
+                        amount=request.amount,
+                        remarks=request.remarks,
+                        to_account_id=None,
+                        to_credit_card_id=None,
+                        to_loan_id=None,
+                        to_emi_id=emi_id,
+                    ),
+                },
+                {
+                    "amount": request.amount * -1,
+                    "id": request.from_account_id,
+                    "user_id": user.id,
+                },
+            ],
+        )
+
+    @classmethod
+    def pay_credit_card(
+        cls,
+        card_id: UUID,
+        user: User,
+        cockroach_client: CockroachDBClient,
+        request: PaymentRequest,
+    ):
+        cockroach_client.queries(
+            fn=[DBservice.get_transaction, DBservice.update_bank_balance],
+            kwargs=[
+                {
+                    "from_account_type": HolderType.fd,
+                    "from_account_id": request.from_account_id,
+                    "user": user,
+                    "cockroach_client": cockroach_client,
+                    "request": CreateTransferTransactionRequest(
+                        amount=request.amount,
+                        remarks=request.remarks,
+                        to_account_id=None,
+                        to_credit_card_id=card_id,
+                        to_loan_id=None,
+                        to_emi_id=None,
+                    ),
+                },
+                {
+                    "amount": request.amount * -1,
+                    "id": request.from_account_id,
+                    "user_id": user.id,
+                },
+            ],
+        )
+
+    @classmethod
+    def pay_loan(
+        cls,
+        loan_id: UUID,
+        user: User,
+        cockroach_client: CockroachDBClient,
+        request: PaymentRequest,
+    ):
+        cockroach_client.queries(
+            fn=[DBservice.get_transaction, DBservice.update_bank_balance],
+            kwargs=[
+                {
+                    "from_account_type": HolderType.fd,
+                    "from_account_id": request.from_account_id,
+                    "user": user,
+                    "cockroach_client": cockroach_client,
+                    "request": CreateTransferTransactionRequest(
+                        amount=request.amount,
+                        remarks=request.remarks,
+                        to_account_id=None,
+                        to_credit_card_id=None,
+                        to_loan_id=loan_id,
+                        to_emi_id=None,
+                    ),
+                },
+                {
+                    "amount": request.amount * -1,
+                    "id": request.from_account_id,
+                    "user_id": user.id,
+                },
+            ],
         )

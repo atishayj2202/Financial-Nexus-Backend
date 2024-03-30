@@ -106,14 +106,18 @@ class DBservice:
     @classmethod
     def update_bank_balance(cls, db: Session, amount: float, id: UUID, user_id: UUID):
         db.execute(
-            text("UPDATE banks SET balance = balance + :amount WHERE id = :id and disabled is NULL and user_id = :user_id"),
+            text(
+                "UPDATE banks SET balance = balance + :amount WHERE id = :id and disabled is NULL and user_id = :user_id"
+            ),
             {"amount": amount, "id": id, "user_id": user_id},
         )
 
     @classmethod
     def update_bank_balance_deprecated(cls, db: Session, amount: float, id: UUID):
         db.execute(
-            text("UPDATE banks SET balance = balance + :amount WHERE id = :id and disabled is NULL"),
+            text(
+                "UPDATE banks SET balance = balance + :amount WHERE id = :id and disabled is NULL"
+            ),
             {"amount": amount, "id": id},
         )
 
@@ -174,7 +178,9 @@ class DBservice:
                     )
                 ],
             )
-            cls.update_bank_balance(db, amount=((request.amount) * -1), id=bank.id, user_id=user.id)
+            cls.update_bank_balance(
+                db, amount=((request.amount) * -1), id=bank.id, user_id=user.id
+            )
         elif request.from_credit_card_id is not None:
             card: CreditCard = cls.__verify_card(
                 cockroach_client, user, request.from_credit_card_id
@@ -287,7 +293,9 @@ class DBservice:
                     )
                 ],
             )
-            cls.update_bank_balance(db, amount=request.amount, id=bank.id, user_id=user.id)
+            cls.update_bank_balance(
+                db, amount=request.amount, id=bank.id, user_id=user.id
+            )
         elif request.to_credit_card_id is not None:
             card: CreditCard = cls.__verify_card(
                 cockroach_client, user, request.to_credit_card_id

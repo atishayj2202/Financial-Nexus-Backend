@@ -31,12 +31,6 @@ class StockInvestmentResponse(BaseModel):
     initial_amount: float
 
 
-class DisolveStockInvestmentRequest(BaseModel):
-    remarks: str | None = None
-    to_account_id: UUID
-    amount: float
-
-
 class CreateFDRequest(BaseModel):
     amount: float
     bank_name: str
