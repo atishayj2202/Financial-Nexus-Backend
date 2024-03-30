@@ -24,12 +24,16 @@ class ExpenseRequest(BaseModel):
     from_emi: CreateEMIRequest | None = None
 
 
-class ShortTransactionResponse(BaseModel):
+class TransactionResponse(BaseModel):
     id: UUID
     created_at: datetime
     amount: float
     remarks: str | None = None
-    transaction_type: HolderType
+    transaction_type: str
+    from_id: UUID | None = None
+    from_type: HolderType | None = None
+    to_id: UUID | None = None
+    to_type: HolderType | None = None
 
 
 class CreateTransactionRequest(BaseModel):

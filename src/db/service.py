@@ -91,7 +91,7 @@ class DBservice:
     @classmethod
     def update_credit_card_balance(cls, db: Session, amount: float, id: UUID):
         db.execute(
-            text("UPDATE cards SET pending = pending + :amount WHERE id = :id"),
+            text("UPDATE cards SET pending = pending - :amount WHERE id = :id"),
             {"amount": amount, "id": id},
         )
 

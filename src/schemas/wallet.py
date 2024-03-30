@@ -3,6 +3,8 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
+from src.schemas.income import TransactionResponse
+
 
 class CreateBankRequest(BaseModel):
     name: str
@@ -19,6 +21,7 @@ class BankResponse(BaseModel):
     balance: float
     remarks: str | None = None
     disabled: datetime | None = None
+    transactions: TransactionResponse | None = None
 
 
 class CreateCreditCardRequest(BaseModel):
@@ -38,3 +41,4 @@ class CreditCardResponse(BaseModel):
     balance: float
     remarks: str | None = None
     disabled: datetime | None = None
+    transactions: TransactionResponse | None = None
