@@ -12,7 +12,7 @@ from src.routers.data_add import data_add_router
 from src.routers.user import user_router
 from src.utils.client import getCockroachClient, getFirebaseClient
 
-app = FastAPI(title="Financial Nexus Backend", version="0.1.1-dev0")
+app = FastAPI(title="Financial Nexus Backend", version="0.1.1-dev1")
 
 origins = os.environ["CORS_ORIGINS"].split(",")
 
