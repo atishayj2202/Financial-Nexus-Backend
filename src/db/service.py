@@ -190,7 +190,7 @@ class DBservice:
                         from_account_type=HolderType.loan,
                         to_account_id=to_account_id,
                         to_account_type=to_account_type,
-                        amount=request.amount,
+                        amount=loan_req.amount,
                         remarks=request.remarks,
                     )
                 ],
@@ -219,7 +219,7 @@ class DBservice:
                         from_account_type=HolderType.emi,
                         to_account_id=to_account_id,
                         to_account_type=to_account_type,
-                        amount=request.amount,
+                        amount=emi_req.amount,
                         remarks=request.remarks,
                     )
                 ],
