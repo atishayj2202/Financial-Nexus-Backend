@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 
 from src.auth.user_auth import VerifiedUser, verify_user
 from src.client.cockroach import CockroachDBClient
+from src.schemas.income import TransactionResponse
 from src.schemas.investment import AssetResponse, FDResponse, StockResponse
 from src.schemas.liability import EMIResponse, LoanResponse
 from src.schemas.wallet import BankResponse, CreditCardResponse
@@ -10,7 +11,7 @@ from src.utils.client import getCockroachClient
 
 DATA_GET_PREFIX = "/data-get"
 data_get_router = APIRouter(prefix=DATA_GET_PREFIX)
-ENDPOINT_GET_TRANSACTIONS = "/get-transactions/"  # pending
+ENDPOINT_GET_TRANSACTIONS = "/get-transactions/"  # done
 ENDPOINT_GET_BANKS = "/get-banks/"  # done
 ENDPOINT_GET_CARDS = "/get-cards/"  # done
 ENDPOINT_GET_STOCKS = "/get-stocks/"  # pending
@@ -26,6 +27,18 @@ ENDPOINT_GET_ASSET = "/{asset_id}/get-asset/"  # pending
 ENDPOINT_GET_LOAN = "/{loan_id}/get-loan/"  # pending
 ENDPOINT_GET_EMI = "/{emi_id}/get-emi/"  # pending
 ENDPOINT_GET_EXPENSE = "/{expense_id}/get-expense/"  # pending
+
+
+@data_get_router.get(
+    ENDPOINT_GET_TRANSACTIONS, response_model=list[TransactionResponse]
+)
+async def get_transactions(
+    verified_user: VerifiedUser = Depends(verify_user),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+):
+    return GetService.get_transactions(
+        user=verified_user.requesting_user, cockroach_client=cockroach_client
+    )
 
 
 @data_get_router.get(ENDPOINT_GET_BANKS, response_model=list[BankResponse])

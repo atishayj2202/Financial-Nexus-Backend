@@ -6,13 +6,71 @@ from src.db.table.emi import EMI
 from src.db.table.fd import FD
 from src.db.table.loan import Loan
 from src.db.table.stock import Stock
+from src.db.table.transaction import Transaction
 from src.db.table.user import User
+from src.schemas.income import TransactionResponse
 from src.schemas.investment import AssetResponse, FDResponse, StockResponse
 from src.schemas.liability import EMIResponse, LoanResponse
 from src.schemas.wallet import BankResponse, CreditCardResponse
+from src.utils.enums import HolderType
 
 
 class GetService:
+    @classmethod
+    def evaluateTransaction(cls, transaction: Transaction) -> TransactionResponse:
+        transaction_type = ""
+        if transaction.from_account_type == HolderType.income:
+            transaction_type = "Income"
+        elif transaction.to_account_type == HolderType.expense:
+            transaction_type = "Expense"
+        elif transaction.to_account_type == HolderType.emi:
+            transaction_type = "EMI Payment"
+        elif transaction.to_account_type == HolderType.loan:
+            transaction_type = "Loan Payment"
+        elif transaction.to_account_type == HolderType.stock:
+            transaction_type = "Stock Purchase"
+        elif transaction.to_account_type == HolderType.credit_card:
+            transaction_type = "Credit Card Payment"
+        elif transaction.to_account_type == HolderType.fd:
+            transaction_type = "FD Purchase"
+        elif transaction.to_account_type == HolderType.asset:
+            transaction_type = "Asset Purchase"
+        elif transaction.from_account_type == HolderType.loan:
+            transaction_type = "Loan Disbursement"
+        elif transaction.from_account_type == HolderType.emi:
+            transaction_type = "EMI Disbursement"
+        elif transaction.from_account_type == HolderType.stock:
+            transaction_type = "Stock Sale"
+        elif transaction.from_account_type == HolderType.fd:
+            transaction_type = "FD Break"
+        elif transaction.from_account_type == HolderType.asset:
+            transaction_type = "Asset Sale"
+        return TransactionResponse(
+            id=transaction.id,
+            created_at=transaction.created_at,
+            amount=transaction.amount,
+            remarks=transaction.remarks,
+            transaction_type=transaction_type,
+            from_id=transaction.from_account_id,
+            from_type=transaction.from_account_type,
+            to_id=transaction.to_account_id,
+            to_type=transaction.to_account_type,
+        )
+
+    @classmethod
+    def get_transactions(
+        cls, user: User, cockroach_client: CockroachDBClient
+    ) -> list[TransactionResponse]:
+        transactions: list[Transaction] = cockroach_client.query(
+            Transaction.get_by_field_multiple,
+            field="user_id",
+            match_value=user.id,
+            error_not_exist=False,
+        )
+        if transactions is None:
+            return []
+        return [cls.evaluateTransaction(transaction) for transaction in transactions]
+
     @classmethod
     def get_banks(
         cls, user: User, cockroach_client: CockroachDBClient
