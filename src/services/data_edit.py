@@ -5,13 +5,16 @@ from starlette.exceptions import HTTPException
 
 from src.client.cockroach import CockroachDBClient
 from src.db.service import DBservice
+from src.db.table.asset import Asset
 from src.db.table.bank import Bank
 from src.db.table.credit_card import CreditCard
 from src.db.table.emi import EMI
+from src.db.table.fd import FD
 from src.db.table.loan import Loan
+from src.db.table.stock import Stock
 from src.db.table.user import User
 from src.schemas.income import CreateTransferTransactionRequest
-from src.schemas.payment import PaymentRequest
+from src.schemas.payment import PaymentRequest, SellRequest, SellStockRequest
 from src.utils.enums import HolderType
 from src.utils.time import get_current_time
 
@@ -155,7 +158,7 @@ class EditService:
             fn=[DBservice.get_transaction, DBservice.update_bank_balance],
             kwargs=[
                 {
-                    "from_account_type": HolderType.fd,
+                    "from_account_type": HolderType.bank,
                     "from_account_id": request.from_account_id,
                     "user": user,
                     "cockroach_client": cockroach_client,
@@ -188,7 +191,7 @@ class EditService:
             fn=[DBservice.get_transaction, DBservice.update_bank_balance],
             kwargs=[
                 {
-                    "from_account_type": HolderType.fd,
+                    "from_account_type": HolderType.bank,
                     "from_account_id": request.from_account_id,
                     "user": user,
                     "cockroach_client": cockroach_client,
@@ -221,7 +224,7 @@ class EditService:
             fn=[DBservice.get_transaction, DBservice.update_bank_balance],
             kwargs=[
                 {
-                    "from_account_type": HolderType.fd,
+                    "from_account_type": HolderType.bank,
                     "from_account_id": request.from_account_id,
                     "user": user,
                     "cockroach_client": cockroach_client,
@@ -238,6 +241,182 @@ class EditService:
                     "amount": request.amount * -1,
                     "id": request.from_account_id,
                     "user_id": user.id,
+                },
+            ],
+        )
+
+    @classmethod
+    def sell_stock(
+        cls,
+        stock_id: UUID,
+        user: User,
+        cockroach_client: CockroachDBClient,
+        request: SellStockRequest,
+    ):
+        stock: Stock = cockroach_client.query(
+            Stock.get_id,
+            id=stock_id,
+            error_not_exist=False,
+        )
+        if stock is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Stock not found",
+            )
+        if stock.user_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Unauthorized",
+            )
+        if stock.disabled is not None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Stock already sold",
+            )
+        stock.avg_sell_price = (
+            (stock.avg_sell_price * stock.already_sold) + request.amount
+        ) / (stock.already_sold + request.quantity)
+        stock.already_sold += request.quantity
+        if stock.already_sold > stock.quantity:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Quantity exceeds stock",
+            )
+        if stock.quantity == stock.already_sold:
+            stock.disabled = get_current_time()
+        cockroach_client.queries(
+            fn=[DBservice.get_transaction, Stock.update_by_id],
+            kwargs=[
+                {
+                    "from_account_type": HolderType.stock,
+                    "from_account_id": stock.id,
+                    "user": user,
+                    "cockroach_client": cockroach_client,
+                    "request": CreateTransferTransactionRequest(
+                        amount=request.amount,
+                        remarks=request.remarks,
+                        to_account_id=request.to_account_id,
+                        to_credit_card_id=None,
+                        to_loan_id=None,
+                        to_emi_id=None,
+                    ),
+                },
+                {
+                    "new_data": stock,
+                    "id": stock.id,
+                },
+            ],
+        )
+
+    @classmethod
+    def sell_asset(
+        cls,
+        asset_id: UUID,
+        user: User,
+        cockroach_client: CockroachDBClient,
+        request: SellRequest,
+    ):
+        asset: Asset = cockroach_client.query(
+            Asset.get_id,
+            id=asset_id,
+            error_not_exist=False,
+        )
+        if asset is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Stock not found",
+            )
+        if asset.user_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Unauthorized",
+            )
+        if asset.disabled is not None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Stock already sold",
+            )
+        asset.sell_price = request.amount
+        asset.disabled = get_current_time()
+        cockroach_client.queries(
+            fn=[DBservice.get_transaction, Asset.update_by_id],
+            kwargs=[
+                {
+                    "from_account_type": HolderType.asset,
+                    "from_account_id": asset.id,
+                    "user": user,
+                    "cockroach_client": cockroach_client,
+                    "request": CreateTransferTransactionRequest(
+                        amount=request.amount,
+                        remarks=request.remarks,
+                        to_account_id=request.to_account_id,
+                        to_credit_card_id=None,
+                        to_loan_id=None,
+                        to_emi_id=None,
+                    ),
+                },
+                {
+                    "new_data": asset,
+                    "id": asset.id,
+                },
+            ],
+        )
+
+    @classmethod
+    def sell_fd(
+        cls,
+        fd_id: UUID,
+        user: User,
+        cockroach_client: CockroachDBClient,
+        request: SellRequest,
+    ):
+        fd: FD = cockroach_client.query(
+            FD.get_id,
+            id=fd_id,
+            error_not_exist=False,
+        )
+        if fd is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Stock not found",
+            )
+        if fd.user_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Unauthorized",
+            )
+        if fd.disabled is not None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Stock already sold",
+            )
+        fd.sell_amount = request.amount
+        if request.amount < fd.amount:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Amount less than Principle amount",
+            )
+        fd.disabled = get_current_time()
+        cockroach_client.queries(
+            fn=[DBservice.get_transaction, FD.update_by_id],
+            kwargs=[
+                {
+                    "from_account_type": HolderType.fd,
+                    "from_account_id": fd.id,
+                    "user": user,
+                    "cockroach_client": cockroach_client,
+                    "request": CreateTransferTransactionRequest(
+                        amount=request.amount,
+                        remarks=request.remarks,
+                        to_account_id=request.to_account_id,
+                        to_credit_card_id=None,
+                        to_loan_id=None,
+                        to_emi_id=None,
+                    ),
+                },
+                {
+                    "new_data": fd,
+                    "id": fd.id,
                 },
             ],
         )
