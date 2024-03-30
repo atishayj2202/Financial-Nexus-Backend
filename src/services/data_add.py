@@ -269,6 +269,7 @@ class AddService:
                 {
                     "amount": request.amount,
                     "id": request.to_account_id,
+                    "user_id": user.id,
                 },
             ],
         )
@@ -305,6 +306,7 @@ class AddService:
                 {
                     "amount": request.amount,
                     "id": request.to_account_id,
+                    "user_id": user.id,
                 },
             ],
         )
