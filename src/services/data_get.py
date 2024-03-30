@@ -1,4 +1,10 @@
+from uuid import UUID
+
+from starlette import status
+from starlette.exceptions import HTTPException
+
 from src.client.cockroach import CockroachDBClient
+from src.db.service import DBservice
 from src.db.table.asset import Asset
 from src.db.table.bank import Bank
 from src.db.table.credit_card import CreditCard
@@ -252,3 +258,236 @@ class GetService:
             )
             for asset in assets
         ]
+
+    @classmethod
+    def get_bank(
+        cls, id: UUID, user: User, cockroach_client: CockroachDBClient
+    ) -> BankResponse:
+        bank: Bank = cockroach_client.query(
+            Bank.get_by_multiple_field_unique,
+            fields=["id", "user_id"],
+            match_values=[id, user.id],
+            error_not_exist=False,
+        )
+        if bank is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Bank not found",
+            )
+        transactions: list[Transaction] = cockroach_client.query(
+            DBservice.get_transactions,
+            id=bank.id,
+        )
+        return BankResponse(
+            id=bank.id,
+            name=bank.name,
+            bank_name=bank.bank_name,
+            balance=bank.balance,
+            created_at=bank.created_at,
+            disabled=bank.disabled,
+            remarks=bank.remarks,
+            transactions=[
+                cls.evaluateTransaction(transaction) for transaction in transactions
+            ],
+        )
+
+    @classmethod
+    def get_card(
+        cls, id: UUID, user: User, cockroach_client: CockroachDBClient
+    ) -> CreditCardResponse:
+        card: CreditCard = cockroach_client.query(
+            CreditCard.get_by_multiple_field_unique,
+            fields=["id", "user_id"],
+            match_values=[id, user.id],
+            error_not_exist=False,
+        )
+        if card is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Card not found",
+            )
+        transactions: list[Transaction] = cockroach_client.query(
+            DBservice.get_transactions,
+            id=card.id,
+        )
+        return CreditCardResponse(
+            id=card.id,
+            created_at=card.created_at,
+            name=card.name,
+            card_name=card.card_name,
+            card_limit=card.credit_limit,
+            pending_limit=card.credit_limit - card.pending,
+            balance=card.pending,
+            disabled=card.disabled,
+            remarks=card.remarks,
+            transactions=[
+                cls.evaluateTransaction(transaction) for transaction in transactions
+            ],
+        )
+
+    @classmethod
+    def get_emi(
+        cls, id: UUID, user: User, cockroach_client: CockroachDBClient
+    ) -> list[EMIResponse]:
+        emi: EMI = cockroach_client.query(
+            EMI.get_by_multiple_field_unique,
+            fields=["id", "user_id"],
+            match_values=[id, user.id],
+            error_not_exist=False,
+        )
+        if emi is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="EMI not found",
+            )
+        transactions: list[Transaction] = cockroach_client.query(
+            DBservice.get_transactions,
+            id=emi.id,
+        )
+        return [
+            EMIResponse(
+                id=emi.id,
+                created_at=emi.created_at,
+                name=emi.name,
+                bank_name=emi.bank_name,
+                monthly=emi.monthly,
+                pending=emi.pending,
+                total_time=emi.total_time,
+                disabled=emi.disabled,
+                remarks=emi.remarks,
+                transactions=[
+                    cls.evaluateTransaction(transaction) for transaction in transactions
+                ],
+            )
+        ]
+
+    @classmethod
+    def get_loan(
+        cls, id: UUID, user: User, cockroach_client: CockroachDBClient
+    ) -> LoanResponse:
+        loan: Loan = cockroach_client.query(
+            Loan.get_by_multiple_field_unique,
+            fields=["id", "user_id"],
+            match_values=[id, user.id],
+            error_not_exist=False,
+        )
+        if loan is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Loan not found",
+            )
+        transactions: list[Transaction] = cockroach_client.query(
+            DBservice.get_transactions,
+            id=loan.id,
+        )
+        return LoanResponse(
+            id=loan.id,
+            created_at=loan.created_at,
+            name=loan.name,
+            bank_name=loan.bank_name,
+            paid=loan.total_amount - loan.pending,
+            total_amount=loan.total_amount,
+            disabled=loan.disabled,
+            remarks=loan.remarks,
+            transactions=[
+                cls.evaluateTransaction(transaction) for transaction in transactions
+            ],
+        )
+
+    @classmethod
+    def get_fd(
+        cls, id: UUID, user: User, cockroach_client: CockroachDBClient
+    ) -> FDResponse:
+        fd: FD = cockroach_client.query(
+            FD.get_by_multiple_field_unique,
+            fields=["id", "user_id"],
+            match_values=[id, user.id],
+            error_not_exist=False,
+        )
+        if fd is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="FD not found",
+            )
+        transactions: list[Transaction] = cockroach_client.query(
+            DBservice.get_transactions,
+            id=fd.id,
+        )
+        return FDResponse(
+            id=fd.id,
+            created_at=fd.created_at,
+            bank_name=fd.bank_name,
+            initial_amount=fd.amount,
+            interest_rate=fd.interest_rate,
+            duration=fd.duration,
+            sell_amount=fd.sell_amount,
+            remarks=fd.remarks,
+            disabled=fd.disabled,
+            transactions=[
+                cls.evaluateTransaction(transaction) for transaction in transactions
+            ],
+        )
+
+    @classmethod
+    def get_stock(
+        cls, id: UUID, user: User, cockroach_client: CockroachDBClient
+    ) -> StockResponse:
+        stock: Stock = cockroach_client.query(
+            Stock.get_by_multiple_field_unique,
+            fields=["id", "user_id"],
+            match_values=[id, user.id],
+            error_not_exist=False,
+        )
+        if stock is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Stock not found",
+            )
+        transactions: list[Transaction] = cockroach_client.query(
+            DBservice.get_transactions,
+            id=stock.id,
+        )
+        return StockResponse(
+            id=stock.id,
+            created_at=stock.created_at,
+            symbol=stock.symbol,
+            quantity_left=stock.amount - stock.already_sold,
+            quantity_sold=stock.already_sold,
+            remarks=stock.remarks,
+            disabled=stock.disabled,
+            transactions=[
+                cls.evaluateTransaction(transaction) for transaction in transactions
+            ],
+        )
+
+    @classmethod
+    def get_asset(
+        cls, id: UUID, user: User, cockroach_client: CockroachDBClient
+    ) -> AssetResponse:
+        asset: Asset = cockroach_client.query(
+            Asset.get_by_multiple_field_unique,
+            fields=["id", "user_id"],
+            match_values=[id, user.id],
+            error_not_exist=False,
+        )
+        if asset is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Asset not found",
+            )
+        transactions: list[Transaction] = cockroach_client.query(
+            DBservice.get_transactions,
+            id=asset.id,
+        )
+        return AssetResponse(
+            id=asset.id,
+            created_at=asset.created_at,
+            name=asset.name,
+            initial_amount=asset.amount,
+            sell_price=asset.sell_price,
+            remarks=asset.remarks,
+            disabled=asset.disabled,
+            transactions=[
+                cls.evaluateTransaction(transaction) for transaction in transactions
+            ],
+        )

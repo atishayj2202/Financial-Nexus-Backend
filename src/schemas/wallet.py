@@ -21,7 +21,7 @@ class BankResponse(BaseModel):
     balance: float
     remarks: str | None = None
     disabled: datetime | None = None
-    transactions: TransactionResponse | None = None
+    transactions: list[TransactionResponse] | None = None
 
 
 class CreateCreditCardRequest(BaseModel):
@@ -41,4 +41,4 @@ class CreditCardResponse(BaseModel):
     balance: float
     remarks: str | None = None
     disabled: datetime | None = None
-    transactions: TransactionResponse | None = None
+    transactions: list[TransactionResponse] | None = None

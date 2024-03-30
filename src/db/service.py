@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import text
+from sqlalchemy import or_, text
 from sqlalchemy.orm import Session
 from starlette import status
 from starlette.exceptions import HTTPException
@@ -20,6 +20,23 @@ from src.utils.enums import HolderType
 
 
 class DBservice:
+    @classmethod
+    def get_transactions(cls, db: Session, id: UUID) -> list[Transaction]:
+        schema_cls = Transaction._schema_cls()
+        result = (
+            db.query(schema_cls)
+            .filter(
+                or_(
+                    getattr(schema_cls, "from_account_id") == id,
+                    getattr(schema_cls, "to_account_id") == id,
+                )
+            )
+            .all()
+        )
+        if result:
+            return [Transaction.model_validate(r, from_attributes=True) for r in result]
+        return []
+
     @classmethod
     def __verify(cls, user: User, instance):
         if instance is None:

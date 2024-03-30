@@ -3,6 +3,8 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
+from src.schemas.income import TransactionResponse
+
 
 class CreateEMIRequest(BaseModel):
     amount: float | None = None
@@ -43,3 +45,4 @@ class EMIResponse(BaseModel):
     total_time: int
     remarks: str | None = None
     disabled: datetime | None = None
+    transactions: list[TransactionResponse] | None = None

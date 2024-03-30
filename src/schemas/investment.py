@@ -3,6 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
+from src.schemas.income import TransactionResponse
 from src.schemas.liability import CreateEMIRequest, CreateLoanRequest
 
 
@@ -64,6 +65,7 @@ class StockResponse(BaseModel):
     quantity_left: float
     quantity_sold: float
     remarks: str | None = None
+    transactions: list[TransactionResponse] | None = None
 
 
 class FDResponse(BaseModel):
@@ -76,6 +78,7 @@ class FDResponse(BaseModel):
     interest_rate: float
     sell_amount: float
     duration: float
+    transactions: list[TransactionResponse] | None = None
 
 
 class AssetResponse(BaseModel):
@@ -86,3 +89,4 @@ class AssetResponse(BaseModel):
     name: str
     initial_amount: float
     sell_price: float
+    transactions: list[TransactionResponse] | None = None

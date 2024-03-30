@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Depends
 
 from src.auth.user_auth import VerifiedUser, verify_user
@@ -19,13 +21,13 @@ ENDPOINT_GET_FDS = "/get-fds/"  # pending
 ENDPOINT_GET_ASSETS = "/get-assets/"  # pending
 ENDPOINT_GET_LOANS = "/get-loans/"  # done
 ENDPOINT_GET_EMIS = "/get-emis/"  # done
-ENDPOINT_GET_BANK = "/{bank_id}/get-bank/"  # pending
-ENDPOINT_GET_CARD = "/{card_id}/get-card/"  # pending
-ENDPOINT_GET_STOCK = "/{stock_id}/get-stock/"  # pending
-ENDPOINT_GET_FD = "/{fd_id}/get-fd/"  # pending
-ENDPOINT_GET_ASSET = "/{asset_id}/get-asset/"  # pending
-ENDPOINT_GET_LOAN = "/{loan_id}/get-loan/"  # pending
-ENDPOINT_GET_EMI = "/{emi_id}/get-emi/"  # pending
+ENDPOINT_GET_BANK = "/{bank_id}/get-bank/"  # done
+ENDPOINT_GET_CARD = "/{card_id}/get-card/"  # done
+ENDPOINT_GET_STOCK = "/{stock_id}/get-stock/"  # done
+ENDPOINT_GET_FD = "/{fd_id}/get-fd/"  # done
+ENDPOINT_GET_ASSET = "/{asset_id}/get-asset/"  # done
+ENDPOINT_GET_LOAN = "/{loan_id}/get-loan/"  # done
+ENDPOINT_GET_EMI = "/{emi_id}/get-emi/"  # done
 ENDPOINT_GET_EXPENSE = "/{expense_id}/get-expense/"  # pending
 
 
@@ -108,4 +110,82 @@ async def get_stocks(
 ):
     return GetService.get_stocks(
         user=verified_user.requesting_user, cockroach_client=cockroach_client
+    )
+
+
+@data_get_router.get(ENDPOINT_GET_BANK, response_model=BankResponse)
+async def get_bank(
+    bank_id: UUID,
+    verified_user: VerifiedUser = Depends(verify_user),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+):
+    return GetService.get_bank(
+        id=bank_id,
+        user=verified_user.requesting_user,
+        cockroach_client=cockroach_client,
+    )
+
+
+@data_get_router.get(ENDPOINT_GET_CARD, response_model=CreditCardResponse)
+async def get_card(
+    card_id: UUID,
+    verified_user: VerifiedUser = Depends(verify_user),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+):
+    return GetService.get_card(
+        id=card_id,
+        user=verified_user.requesting_user,
+        cockroach_client=cockroach_client,
+    )
+
+
+@data_get_router.get(ENDPOINT_GET_EMI, response_model=EMIResponse)
+async def get_emi(
+    emi_id: UUID,
+    verified_user: VerifiedUser = Depends(verify_user),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+):
+    return GetService.get_emi(
+        id=emi_id,
+        user=verified_user.requesting_user,
+        cockroach_client=cockroach_client,
+    )
+
+
+@data_get_router.get(ENDPOINT_GET_LOAN, response_model=LoanResponse)
+async def get_loan(
+    loan_id: UUID,
+    verified_user: VerifiedUser = Depends(verify_user),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+):
+    return GetService.get_loan(
+        id=loan_id,
+        user=verified_user.requesting_user,
+        cockroach_client=cockroach_client,
+    )
+
+
+@data_get_router.get(ENDPOINT_GET_FD, response_model=FDResponse)
+async def get_fd(
+    fd_id: UUID,
+    verified_user: VerifiedUser = Depends(verify_user),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+):
+    return GetService.get_fd(
+        id=fd_id,
+        user=verified_user.requesting_user,
+        cockroach_client=cockroach_client,
+    )
+
+
+@data_get_router.get(ENDPOINT_GET_ASSET, response_model=AssetResponse)
+async def get_asset(
+    asset_id: UUID,
+    verified_user: VerifiedUser = Depends(verify_user),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+):
+    return GetService.get_asset(
+        id=asset_id,
+        user=verified_user.requesting_user,
+        cockroach_client=cockroach_client,
     )
