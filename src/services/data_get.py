@@ -14,7 +14,7 @@ from src.db.table.loan import Loan
 from src.db.table.stock import Stock
 from src.db.table.transaction import Transaction
 from src.db.table.user import User
-from src.schemas.income import TransactionResponse
+from src.schemas.user import TransactionResponse
 from src.schemas.investment import AssetResponse, FDResponse, StockResponse
 from src.schemas.liability import EMIResponse, LoanResponse
 from src.schemas.wallet import BankResponse, CreditCardResponse

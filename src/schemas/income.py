@@ -4,7 +4,6 @@ from uuid import UUID
 from pydantic import BaseModel
 
 from src.schemas.liability import CreateEMIRequest, CreateLoanRequest
-from src.utils.enums import HolderType
 
 
 class IncomeRequest(BaseModel):
@@ -22,18 +21,6 @@ class ExpenseRequest(BaseModel):
     from_credit_card_id: UUID | None = None
     from_loan: CreateLoanRequest | None = None
     from_emi: CreateEMIRequest | None = None
-
-
-class TransactionResponse(BaseModel):
-    id: UUID
-    created_at: datetime
-    amount: float
-    remarks: str | None = None
-    transaction_type: str
-    from_id: UUID | None = None
-    from_type: HolderType | None = None
-    to_id: UUID | None = None
-    to_type: HolderType | None = None
 
 
 class CreateTransactionRequest(BaseModel):

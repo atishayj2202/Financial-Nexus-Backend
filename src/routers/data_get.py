@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 
 from src.auth.user_auth import VerifiedUser, verify_user
 from src.client.cockroach import CockroachDBClient
-from src.schemas.income import TransactionResponse
+from src.schemas.user import TransactionResponse
 from src.schemas.investment import AssetResponse, FDResponse, StockResponse
 from src.schemas.liability import EMIResponse, LoanResponse
 from src.schemas.wallet import BankResponse, CreditCardResponse
@@ -16,9 +16,9 @@ data_get_router = APIRouter(prefix=DATA_GET_PREFIX)
 ENDPOINT_GET_TRANSACTIONS = "/get-transactions/"  # done
 ENDPOINT_GET_BANKS = "/get-banks/"  # done
 ENDPOINT_GET_CARDS = "/get-cards/"  # done
-ENDPOINT_GET_STOCKS = "/get-stocks/"  # pending
-ENDPOINT_GET_FDS = "/get-fds/"  # pending
-ENDPOINT_GET_ASSETS = "/get-assets/"  # pending
+ENDPOINT_GET_STOCKS = "/get-stocks/"  # done
+ENDPOINT_GET_FDS = "/get-fds/"  # done
+ENDPOINT_GET_ASSETS = "/get-assets/"  # done
 ENDPOINT_GET_LOANS = "/get-loans/"  # done
 ENDPOINT_GET_EMIS = "/get-emis/"  # done
 ENDPOINT_GET_BANK = "/{bank_id}/get-bank/"  # done
