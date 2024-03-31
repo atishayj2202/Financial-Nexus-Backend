@@ -277,12 +277,12 @@ class EditService:
             (stock.avg_sell_price * stock.already_sold) + request.amount
         ) / (stock.already_sold + request.quantity)
         stock.already_sold += request.quantity
-        if stock.already_sold > stock.quantity:
+        if stock.already_sold > stock.amount:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Quantity exceeds stock",
             )
-        if stock.quantity == stock.already_sold:
+        if stock.amount == stock.already_sold:
             stock.disabled = get_current_time()
         cockroach_client.queries(
             fn=[DBservice.get_transaction, Stock.update_by_id],
