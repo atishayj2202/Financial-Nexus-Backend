@@ -323,9 +323,7 @@ class AddService:
         sender_message = Message(
             user_id=user.id, message=request.message, message_by=MessageBy.user
         )
-        ai_message = Message(
-            user_id=user.id, message=response, message_by=MessageBy.ai
-        )
+        ai_message = Message(user_id=user.id, message=response, message_by=MessageBy.ai)
         cockroach_client.queries(
             fn=[Message.add, Message.add],
             kwargs=[
