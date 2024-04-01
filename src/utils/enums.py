@@ -20,3 +20,8 @@ class HolderType(Enum):
     stock = "stock"
     fd = "fd"
     asset = "asset"
+
+
+class MessageBy(Enum):
+    user = "user"
+    ai = "ai"
