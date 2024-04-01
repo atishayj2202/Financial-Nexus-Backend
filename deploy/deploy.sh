@@ -5,7 +5,7 @@ export PROJECT_NAME=financial-nexus
 
 # docker details
 export IMAGE_NAME=financial-nexus-backend
-export IMAGE_VERSION=0.1.1
+export IMAGE_VERSION=0.1.2-dev0
 export REPOSITORY_NAME=atishayj2202
 export FULL_IMAGE_NAME=${REPOSITORY_NAME}/${IMAGE_NAME}:${IMAGE_VERSION}
 export FLYWAY_CONTAINER_NAME=flyway/flyway:latest

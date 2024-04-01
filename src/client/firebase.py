@@ -95,4 +95,4 @@ class FirebaseClient:
 
 if __name__ == "__main__":
     client = FirebaseClient()
-    print(client.get_user_token("wNMGOhOSUKM0PBumsBXQHGx1QYh2"))
+    print(client.get_user_token("3RVDt9d58YhQDCQgajZKmJjliGb2"))
