@@ -6,11 +6,10 @@ from src.db.service import DBservice
 from src.db.table.asset import Asset
 from src.db.table.bank import Bank
 from src.db.table.credit_card import CreditCard
-from src.db.table.emi import EMI
 from src.db.table.expenses import Expense
 from src.db.table.fd import FD
+from src.db.table.message import Message
 from src.db.table.stock import Stock
-from src.db.table.transaction import Transaction
 from src.db.table.user import User
 from src.schemas.income import (
     CreateTransactionRequest,
@@ -24,8 +23,10 @@ from src.schemas.investment import (
     CreateStockInvestementRequest,
 )
 from src.schemas.liability import CreateEMIRequest, CreateLoanRequest
+from src.schemas.user import MessageCreateRequest, MessageResponse
 from src.schemas.wallet import CreateBankRequest, CreateCreditCardRequest
-from src.utils.enums import HolderType
+from src.services.ai import get_ai_reply
+from src.utils.enums import HolderType, MessageBy
 
 
 class AddService:
@@ -310,3 +311,43 @@ class AddService:
                 },
             ],
         )
+
+    @classmethod
+    def add_message(
+        cls,
+        request: MessageCreateRequest,
+        user: User,
+        cockroach_client: CockroachDBClient,
+    ) -> list[MessageResponse]:
+        response: str = get_ai_reply(request.message)
+        sender_message = Message(
+            user_id=user.id, message=request.message, message_by=MessageBy.user
+        )
+        ai_message = Message(
+            user_id=user.id, message=response, message_by=MessageBy.ai
+        )
+        cockroach_client.queries(
+            fn=[Message.add, Message.add],
+            kwargs=[
+                {
+                    "items": [sender_message],
+                },
+                {
+                    "items": [ai_message],
+                },
+            ],
+        )
+        return [
+            MessageResponse(
+                id=sender_message.id,
+                created_at=sender_message.created_at,
+                message=sender_message.message,
+                message_by=sender_message.message_by,
+            ),
+            MessageResponse(
+                id=ai_message.id,
+                created_at=ai_message.created_at,
+                message=ai_message.message,
+                message_by=ai_message.message_by,
+            ),
+        ]

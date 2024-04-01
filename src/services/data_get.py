@@ -12,13 +12,14 @@ from src.db.table.emi import EMI
 from src.db.table.expenses import Expense
 from src.db.table.fd import FD
 from src.db.table.loan import Loan
+from src.db.table.message import Message
 from src.db.table.stock import Stock
 from src.db.table.transaction import Transaction
 from src.db.table.user import User
 from src.schemas.income import ExpenseResponse
 from src.schemas.investment import AssetResponse, FDResponse, StockResponse
 from src.schemas.liability import EMIResponse, LoanResponse
-from src.schemas.user import TransactionResponse
+from src.schemas.user import MessageResponse, TransactionResponse
 from src.schemas.wallet import BankResponse, CreditCardResponse
 from src.utils.enums import HolderType
 
@@ -521,3 +522,27 @@ class GetService:
                 cls.evaluateTransaction(transaction) for transaction in transactions
             ],
         )
+
+    @classmethod
+    def get_messages(
+        cls, user: User, cockroach_client: CockroachDBClient
+    ) -> list[MessageResponse]:
+        messages: list[Message] = cockroach_client.query(
+            Message.get_by_field_multiple,
+            field="user_id",
+            match_value=user.id,
+            error_not_exist=False,
+        )
+        if messages is None:
+            return []
+        message_response = [
+            MessageResponse(
+                id=message.id,
+                created_at=message.created_at,
+                message=message.message,
+                message_by=message.message_by,
+            )
+            for message in messages
+        ]
+        message_response = sorted(message_response, key=lambda x: x.created_at)
+        return message_response

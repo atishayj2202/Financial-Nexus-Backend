@@ -11,6 +11,7 @@ from src.schemas.investment import (
     CreateStockInvestementRequest,
 )
 from src.schemas.liability import CreateEMIRequest, CreateLoanRequest
+from src.schemas.user import MessageCreateRequest, MessageResponse
 from src.schemas.wallet import CreateBankRequest, CreateCreditCardRequest
 from src.services.data_add import AddService
 from src.utils.client import getCockroachClient
@@ -26,6 +27,7 @@ ENDPOINT_ADD_FD = "/add-fd/"  # done
 ENDPOINT_ADD_ASSETS = "/add-assets/"  # done
 ENDPOINT_ADD_LOAN = "/add-loan/"  # done
 ENDPOINT_ADD_EMIS = "/add-emis/"  # done
+ENDPOINT_ADD_MESSAGE = "/add-message/"  # pending
 
 
 @data_add_router.post(ENDPOINT_ADD_BANK)
@@ -152,3 +154,16 @@ async def post_add_emis(
         cockroach_client=cockroach_client,
     )
     return Response(status_code=status.HTTP_200_OK)
+
+
+@data_add_router.post(ENDPOINT_ADD_MESSAGE, response_model=list[MessageResponse])
+async def post_add_message(
+    request: MessageCreateRequest,
+    verified_user: VerifiedUser = Depends(verify_user),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+):
+    return AddService.add_message(
+        request=request,
+        user=verified_user.requesting_user,
+        cockroach_client=cockroach_client,
+    )
