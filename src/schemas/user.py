@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from src.utils.enums import HolderType
+from src.utils.enums import HolderType, MessageBy
 
 
 class UserResponse(BaseModel):
@@ -39,3 +39,14 @@ class TransactionResponse(BaseModel):
     from_type: HolderType | None = None
     to_id: UUID | None = None
     to_type: HolderType | None = None
+
+
+class MessageResponse(BaseModel):
+    id: UUID
+    created_at: datetime
+    message: str
+    message_by: MessageBy
+
+
+class MessageCreateRequest(BaseModel):
+    message: str
