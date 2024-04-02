@@ -1,3 +1,4 @@
+import uuid
 from uuid import UUID
 
 from starlette import status
@@ -21,7 +22,8 @@ from src.schemas.investment import AssetResponse, FDResponse, StockResponse
 from src.schemas.liability import EMIResponse, LoanResponse
 from src.schemas.user import MessageResponse, TransactionResponse
 from src.schemas.wallet import BankResponse, CreditCardResponse
-from src.utils.enums import HolderType
+from src.utils.enums import HolderType, MessageBy
+from src.utils.time import get_current_time
 
 
 class GetService:
@@ -534,7 +536,14 @@ class GetService:
             error_not_exist=False,
         )
         if messages is None:
-            return []
+            return [
+                MessageResponse(
+                    id=uuid.uuid4(),
+                    created_at=get_current_time(),
+                    message="[FinBOT]: Hi there! I am FinBOT, a financial counsellor here to assist you with any financial questions or concerns you may have. How can I help you today?",
+                    message_by=MessageBy.ai,
+                )
+            ]
         message_response = [
             MessageResponse(
                 id=message.id,
@@ -545,4 +554,13 @@ class GetService:
             for message in messages
         ]
         message_response = sorted(message_response, key=lambda x: x.created_at)
+        message_response.insert(
+            0,
+            MessageResponse(
+                id=uuid.uuid4(),
+                created_at=get_current_time(),
+                message="[FinBOT]: Hi there! I am FinBOT, a financial counsellor here to assist you with any financial questions or concerns you may have. How can I help you today?",
+                message_by=MessageBy.ai,
+            ),
+        )
         return message_response
