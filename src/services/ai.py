@@ -72,7 +72,7 @@ def aimodel(prompt, asset: list, bank: list, card: list, emi: list, loan: list, 
         for i in range(1, len(stock)):
             stock_prompt = stock_prompt + f"Also, user has purchased {stock[0]['quantity_left']} stocks of {stock[0]['name']} "
 
-    def get_ai_reply(prompt):
+    def get_ai_reply(prompt, asset, bank, card, emi, loan, stock):
         convo = model.start_chat(
             history=[
                 {
@@ -188,3 +188,6 @@ def aimodel(prompt, asset: list, bank: list, card: list, emi: list, loan: list, 
         )
         convo.send_message(prompt)
         return convo.last.text
+    return get_ai_reply(prompt = prompt, asset = asset, bank = bank, card = card, emi = emi, loan = loan, stock = stock)
+# END OF FILE
+# Path: src/services/ai.py
