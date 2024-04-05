@@ -322,32 +322,32 @@ class AddService:
     ) -> list[MessageResponse]:
         temps = GetService.get_banks(user=user, cockroach_client=cockroach_client)
         bank_data: list[dict] = [
-            temp.dict(exclude={"id", "created_at"})
+            temp.dict(exclude={"id", "created_at", "disabled", "transactions"})
             for temp in temps
         ]
         temps = GetService.get_cards(user=user, cockroach_client=cockroach_client)
         card_data: list[dict] = [
-            temp.dict(exclude={"id", "created_at"})
+            temp.dict(exclude={"id", "created_at", "disabled", "transactions"})
             for temp in temps
         ]
         temps = GetService.get_assets(user=user, cockroach_client=cockroach_client)
         asset_data: list[dict] = [
-            temp.dict(exclude={"id", "created_at"})
+            temp.dict(exclude={"id", "created_at", "disabled", "transactions"})
             for temp in temps
         ]
         temps = GetService.get_stocks(user=user, cockroach_client=cockroach_client)
         stock_data: list[dict] = [
-            temp.dict(exclude={"id", "created_at"})
+            temp.dict(exclude={"id", "created_at", "disabled", "transactions"})
             for temp in temps
         ]
         temps = GetService.get_loans(user=user, cockroach_client=cockroach_client)
         loan_data: list[dict] = [
-            temp.dict(exclude={"id", "created_at"})
+            temp.dict(exclude={"id", "created_at", "disabled", "transactions"})
             for temp in temps
         ]
         temps = GetService.get_emis(user=user, cockroach_client=cockroach_client)
         emi_data: list[dict] = [
-            temp.dict(exclude={"id", "created_at"})
+            temp.dict(exclude={"id", "created_at", "disabled", "transactions"})
             for temp in temps
         ]
 
