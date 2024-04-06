@@ -43,37 +43,48 @@ model = genai.GenerativeModel(
 
 def aimodel(prompt: str, asset: list, bank: list, card: list, emi: list, loan: list, stock: list):
     
-    if(len(bank)>0):
+    if(len(bank)==0):
+        bank_prompt = "User has not listed any bank account."
+    elif(len(bank)>0):
         bank_prompt = f"User has a bank account in {bank[0]['bank_name']} with Rs. {bank[0]['balance']} balance. He can refer this account by the name  {bank[0]['name']} "
         if(len(bank)>1):
             for i in range(1, len(bank)):
                 bank_prompt = bank_prompt + f"Also, user has a bank account in {bank[i]['bank_name']} with Rs. {bank[i]['balance']} balance. He can refer this account by the name  {bank[i]['name']} "
-    
-    if(len(asset)>0):
+    if(len(asset)==0):
+        asset_prompt = "User has not listed any asset."
+    elif(len(asset)>0):
         asset_prompt = f"User has a asset named {asset[0]['name']} with {asset[0]['initial_amount']} value "
         if(len(asset)>1):
             for i in range(1, len(asset)):
                 asset_prompt = asset_prompt + f"Also, user has a asset named {asset[i]['name']} with Rs. {asset[i]['initial_amount']} worth of value "
     
-    if(len(card)>0):
+    if(len(card)==0):
+        card_prompt = "User has not listed any credit card."
+    elif(len(card)>0):
         card_prompt = f"User has a credit card named {card[0]['name']} of bank named {card[0]['card_name']} with Rs. {card[0]['card_limit']} limit. Out of the given limit user has spent Rs. {card[0]['balance']} "
         if(len(card)>1):
             for i in range(1, len(card)):
                 card_prompt = card_prompt + f"Also, user has a credit card named {card[i]['name']} of bank named {card[i]['card_name']} with Rs. {card[i]['card_limit']} limit. Out of the given limit user has spent Rs. {card[i]['balance']} "
 
-    if(len(emi)>0):
+    if(len(emi)==0):
+        emi_prompt = "User has not listed any emi."
+    elif(len(emi)>0):
         emi_prompt = f"User has an emi going on by the name of {emi[0]['name']} take from bank named {emi[0]['bank_name']} with Rs. {emi[0]['monthly']} per month. It has a total pending due of Rs. {emi[0]['pending']} and it will take a time of {emi[0]['total_time']} years "
         if(len(emi)>1):
             for i in range(1, len(emi)):
                 emi_prompt = emi_prompt + f"Also, user has an emi going on by the name of {emi[i]['name']} take from bank named {emi[i]['bank_name']} with Rs. {emi[i]['monthly']} per month. It has a total pending due of Rs. {emi[i]['pending']} and it will take a time of {emi[i]['total_time']} years "
     
-    if(len(loan)>0):
+    if(len(loan)==0):
+        loan_prompt = "User has not listed any loan."
+    elif(len(loan)>0):
         loan_prompt = f"User has taken a loan by the name of {loan[0]['name']} take from bank named {loan[0]['bank_name']}. Amount of loan taken is Rs. {loan[0]['total_amount']} and user has currently paid amount of Rs. {loan[0]['paid']} "
         if(len(loan)>1):
             for i in range(1, len(loan)):
                 loan_prompt = loan_prompt + f"Also, user has taken a loan by the name of {loan[i]['name']} take from bank named {loan[i]['bank_name']}. Amount of loan taken is Rs. {loan[i]['total_amount']} and user has currently paid amount of Rs. {loan[i]['paid']} "
 
-    if(len(stock)>0):
+    if(len(stock)==0):
+        stock_prompt = "User has not listed any stock."
+    elif(len(stock)>0):
         stock_prompt = f"User has purchased {stock[0]['quantity_left']} stocks of {stock[0]['symbol']} "
         if(len(stock)>1):
             for i in range(1, len(stock)):
