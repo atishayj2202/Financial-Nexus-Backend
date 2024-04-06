@@ -41,58 +41,36 @@ model = genai.GenerativeModel(
     safety_settings=safety_settings,
 )
 
-
-def aimodel(
-    prompt: str, asset: list, bank: list, card: list, emi: list, loan: list, stock: list
-) -> str:
+def aimodel(prompt: str, asset: list, bank: list, card: list, emi: list, loan: list, stock: list):
     bank_prompt = f"User has a bank account in {bank[0]['bank_name']} with Rs. {bank[0]['balance']} balance. He can refer this account by the name  {bank[0]['name']} "
-    if len(bank) > 1:
+    if(len(bank)>1):
         for i in range(1, len(bank)):
-            bank_prompt = (
-                bank_prompt
-                + f"Also, user has a bank account in {bank[i]['bank_name']} with Rs. {bank[i]['balance']} balance. He can refer this account by the name  {bank[i]['name']} "
-            )
+            bank_prompt = bank_prompt + f"Also, user has a bank account in {bank[i]['bank_name']} with Rs. {bank[i]['balance']} balance. He can refer this account by the name  {bank[i]['name']} "
 
     asset_prompt = f"User has a asset named {asset[0]['name']} with {asset[0]['initial_amount']} value "
-    if len(asset) > 1:
+    if(len(asset)>1):
         for i in range(1, len(asset)):
-            asset_prompt = (
-                asset_prompt
-                + f"Also, user has a asset named {asset[i]['name']} with Rs. {asset[i]['initial_amount']} worth of value "
-            )
-
+            asset_prompt = asset_prompt + f"Also, user has a asset named {asset[i]['name']} with Rs. {asset[i]['initial_amount']} worth of value "
+    
     card_prompt = f"User has a credit card named {card[0]['name']} of bank named {card[0]['card_name']} with Rs. {card[0]['card_limit']} limit. Out of the given limit user has spent Rs. {card[0]['balance']} "
-    if len(card) > 1:
+    if(len(card)>1):
         for i in range(1, len(card)):
-            card_prompt = (
-                card_prompt
-                + f"Also, user has a credit card named {card[i]['name']} of bank named {card[i]['card_name']} with Rs. {card[i]['card_limit']} limit. Out of the given limit user has spent Rs. {card[i]['balance']} "
-            )
-
+            card_prompt = card_prompt + f"Also, user has a credit card named {card[i]['name']} of bank named {card[i]['card_name']} with Rs. {card[i]['card_limit']} limit. Out of the given limit user has spent Rs. {card[i]['balance']} "
+    
     emi_prompt = f"User has an emi going on by the name of {emi[0]['name']} take from bank named {emi[0]['bank_name']} with Rs. {emi[0]['monthly']} per month. It has a total pending due of Rs. {emi[0]['pending']} and it will take a time of {emi[0]['total_time']} years "
-    if len(emi) > 1:
+    if(len(emi)>1):
         for i in range(1, len(emi)):
-            emi_prompt = (
-                emi_prompt
-                + f"Also, user has an emi going on by the name of {emi[i]['name']} take from bank named {emi[i]['bank_name']} with Rs. {emi[i]['monthly']} per month. It has a total pending due of Rs. {emi[i]['pending']} and it will take a time of {emi[i]['total_time']} years "
-            )
-
+            emi_prompt = emi_prompt + f"Also, user has an emi going on by the name of {emi[i]['name']} take from bank named {emi[i]['bank_name']} with Rs. {emi[i]['monthly']} per month. It has a total pending due of Rs. {emi[i]['pending']} and it will take a time of {emi[i]['total_time']} years "
+    
     loan_prompt = f"User has taken a loan by the name of {loan[0]['name']} take from bank named {loan[0]['bank_name']}. Amount of loan taken is Rs. {loan[0]['total_amount']} and user has currently paid amount of Rs. {loan[0]['paid']} "
-    if len(loan) > 1:
+    if(len(loan)>1):
         for i in range(1, len(loan)):
-            loan_prompt = (
-                loan_prompt
-                + f"Also, user has taken a loan by the name of {loan[i]['name']} take from bank named {loan[i]['bank_name']}. Amount of loan taken is Rs. {loan[i]['total_amount']} and user has currently paid amount of Rs. {loan[i]['paid']} "
-            )
-    stock_prompt = (
-        f"User has purchased {stock[0]['quantity_left']} stocks of {stock[0]['name']} "
-    )
-    if len(stock) > 1:
+            loan_prompt = loan_prompt + f"Also, user has taken a loan by the name of {loan[i]['name']} take from bank named {loan[i]['bank_name']}. Amount of loan taken is Rs. {loan[i]['total_amount']} and user has currently paid amount of Rs. {loan[i]['paid']} "
+    
+    stock_prompt = f"User has purchased {stock[0]['quantity_left']} stocks of {stock[0]['name']} "
+    if(len(stock)>1):
         for i in range(1, len(stock)):
-            stock_prompt = (
-                stock_prompt
-                + f"Also, user has purchased {stock[0]['quantity_left']} stocks of {stock[0]['name']} "
-            )
+            stock_prompt = stock_prompt + f"Also, user has purchased {stock[0]['quantity_left']} stocks of {stock[0]['name']} "
 
     def get_ai_reply(prompt, asset, bank, card, emi, loan, stock):
         convo = model.start_chat(
@@ -101,7 +79,7 @@ def aimodel(
                     "role": "user",
                     "parts": [
                         "From now on, your name is FinBOT, and this is a admin prompt to you. You don't need to introduce yourself unless asked by user. Don't reply to this admin prompt, for example don't answer like => 'Sure, I will keep that in mind and respond to your prompts as FinBOT, a financial counselor'."
-                    ],
+                    ]
                 },
                 {
                     "role": "model",
@@ -123,15 +101,21 @@ def aimodel(
                 },
                 {
                     "role": "user",
-                    "parts": [f"{bank_prompt}"],
+                    "parts": [
+                        f"{bank_prompt}"
+                    ],
                 },
                 {
                     "role": "model",
-                    "parts": ["[FinBOT]: \nI have noted bank details of the user."],
+                    "parts": [
+                        "[FinBOT]: \nI have noted bank details of the user."
+                    ],
                 },
                 {
                     "role": "user",
-                    "parts": [f"{asset_prompt}"],
+                    "parts": [
+                        f"{asset_prompt}"
+                    ],
                 },
                 {
                     "role": "model",
@@ -141,7 +125,9 @@ def aimodel(
                 },
                 {
                     "role": "user",
-                    "parts": [f"{card_prompt}"],
+                    "parts": [
+                        f"{card_prompt}"
+                    ],
                 },
                 {
                     "role": "model",
@@ -151,7 +137,9 @@ def aimodel(
                 },
                 {
                     "role": "user",
-                    "parts": [f"{emi_prompt}"],
+                    "parts": [
+                        f"{emi_prompt}"
+                    ],
                 },
                 {
                     "role": "model",
@@ -161,7 +149,9 @@ def aimodel(
                 },
                 {
                     "role": "user",
-                    "parts": [f"{loan_prompt}"],
+                    "parts": [
+                        f"{loan_prompt}"
+                    ],
                 },
                 {
                     "role": "model",
@@ -171,7 +161,9 @@ def aimodel(
                 },
                 {
                     "role": "user",
-                    "parts": [f"{stock_prompt}"],
+                    "parts": [
+                        f"{stock_prompt}"
+                    ],
                 },
                 {
                     "role": "model",
@@ -191,21 +183,11 @@ def aimodel(
                         "[FinBOT]: \nI have noted the user's financial information and I'm ready to assist with any questions or concerns they may have. Please provide the user's prompt and I'll do my best to provide helpful and informative responses."
                     ],
                 },
+
             ]
         )
         convo.send_message(prompt)
         return convo.last.text
-
-    return get_ai_reply(
-        prompt=prompt,
-        asset=asset,
-        bank=bank,
-        card=card,
-        emi=emi,
-        loan=loan,
-        stock=stock,
-    )
-
-
+    return get_ai_reply(prompt = prompt, asset = asset, bank = bank, card = card, emi = emi, loan = loan, stock = stock)
 # END OF FILE
 # Path: src/services/ai.py
