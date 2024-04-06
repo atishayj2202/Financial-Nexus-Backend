@@ -351,7 +351,15 @@ class AddService:
             for temp in temps
         ]
 
-        response: str = aimodel(prompt=request.message,asset=asset_data, bank=bank_data, card=card_data, emi=emi_data, loan=loan_data, stock=stock_data)
+        response: str = aimodel(
+            prompt=request.message,
+            asset=asset_data,
+            bank=bank_data,
+            card=card_data,
+            emi=emi_data,
+            loan=loan_data,
+            stock=stock_data,
+        )
         sender_message = Message(
             user_id=user.id, message=request.message, message_by=MessageBy.user
         )
