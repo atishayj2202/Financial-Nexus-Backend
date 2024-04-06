@@ -194,7 +194,8 @@ def aimodel(prompt: str, asset: list, bank: list, card: list, emi: list, loan: l
             ]
         )
         convo.send_message(prompt)
-        return convo.last.text
+        response = convo.last.text
+        return response
     return get_ai_reply(prompt = prompt, asset = asset, bank = bank, card = card, emi = emi, loan = loan, stock = stock)
 # END OF FILE
 # Path: src/services/ai.py
