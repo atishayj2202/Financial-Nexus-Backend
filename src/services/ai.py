@@ -74,10 +74,10 @@ def aimodel(prompt: str, asset: list, bank: list, card: list, emi: list, loan: l
                 loan_prompt = loan_prompt + f"Also, user has taken a loan by the name of {loan[i]['name']} take from bank named {loan[i]['bank_name']}. Amount of loan taken is Rs. {loan[i]['total_amount']} and user has currently paid amount of Rs. {loan[i]['paid']} "
 
     if(len(stock)>0):
-        stock_prompt = f"User has purchased {stock[0]['quantity_left']} stocks of {stock[0]['symbol']} "
+        stock_prompt = f"User has purchased {stock[0]['quantity_left']} stocks of {stock[0]['name']} "
         if(len(stock)>1):
             for i in range(1, len(stock)):
-                stock_prompt = stock_prompt + f"Also, user has purchased {stock[0]['quantity_left']} stocks of {stock[0]['symbol']} "
+                stock_prompt = stock_prompt + f"Also, user has purchased {stock[0]['quantity_left']} stocks of {stock[0]['name']} "
 
     def get_ai_reply(prompt, asset, bank, card, emi, loan, stock):
         convo = model.start_chat(
