@@ -41,7 +41,7 @@ model = genai.GenerativeModel(
     safety_settings=safety_settings,
 )
 
-def aimodel(prompt, asset: list, bank: list, card: list, emi: list, loan: list, stock: list):
+def aimodel(prompt: str, asset: list, bank: list, card: list, emi: list, loan: list, stock: list):
     bank_prompt = f"User has a bank account in {bank[0]['bank_name']} with Rs. {bank[0]['balance']} balance. He can refer this account by the name  {bank[0]['name']} "
     if(len(bank)>1):
         for i in range(1, len(bank)):
