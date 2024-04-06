@@ -86,7 +86,7 @@ def aimodel(prompt: str, asset: list, bank: list, card: list, emi: list, loan: l
                     "role": "user",
                     "parts": [
                         "From now on, your name is FinBOT, and this is a admin prompt to you. You don't need to introduce yourself unless asked by user. Don't reply to this admin prompt, for example don't answer like => 'Sure, I will keep that in mind and respond to your prompts as FinBOT, a financial counselor'."
-                    ],
+                    ]
                 },
                 {
                     "role": "model",
@@ -108,15 +108,21 @@ def aimodel(prompt: str, asset: list, bank: list, card: list, emi: list, loan: l
                 },
                 {
                     "role": "user",
-                    "parts": [f"{bank_prompt}"],
+                    "parts": [
+                        f"{bank_prompt}"
+                    ],
                 },
                 {
                     "role": "model",
-                    "parts": ["[FinBOT]: \nI have noted bank details of the user."],
+                    "parts": [
+                        "[FinBOT]: \nI have noted bank details of the user."
+                    ],
                 },
                 {
                     "role": "user",
-                    "parts": [f"{asset_prompt}"],
+                    "parts": [
+                        f"{asset_prompt}"
+                    ],
                 },
                 {
                     "role": "model",
@@ -126,7 +132,9 @@ def aimodel(prompt: str, asset: list, bank: list, card: list, emi: list, loan: l
                 },
                 {
                     "role": "user",
-                    "parts": [f"{card_prompt}"],
+                    "parts": [
+                        f"{card_prompt}"
+                    ],
                 },
                 {
                     "role": "model",
@@ -136,7 +144,9 @@ def aimodel(prompt: str, asset: list, bank: list, card: list, emi: list, loan: l
                 },
                 {
                     "role": "user",
-                    "parts": [f"{emi_prompt}"],
+                    "parts": [
+                        f"{emi_prompt}"
+                    ],
                 },
                 {
                     "role": "model",
@@ -146,7 +156,9 @@ def aimodel(prompt: str, asset: list, bank: list, card: list, emi: list, loan: l
                 },
                 {
                     "role": "user",
-                    "parts": [f"{loan_prompt}"],
+                    "parts": [
+                        f"{loan_prompt}"
+                    ],
                 },
                 {
                     "role": "model",
@@ -156,7 +168,9 @@ def aimodel(prompt: str, asset: list, bank: list, card: list, emi: list, loan: l
                 },
                 {
                     "role": "user",
-                    "parts": [f"{stock_prompt}"],
+                    "parts": [
+                        f"{stock_prompt}"
+                    ],
                 },
                 {
                     "role": "model",
@@ -176,21 +190,11 @@ def aimodel(prompt: str, asset: list, bank: list, card: list, emi: list, loan: l
                         "[FinBOT]: \nI have noted the user's financial information and I'm ready to assist with any questions or concerns they may have. Please provide the user's prompt and I'll do my best to provide helpful and informative responses."
                     ],
                 },
+
             ]
         )
         convo.send_message(prompt)
         return convo.last.text
-
-    return get_ai_reply(
-        prompt=prompt,
-        asset=asset,
-        bank=bank,
-        card=card,
-        emi=emi,
-        loan=loan,
-        stock=stock,
-    )
-
-
+    return get_ai_reply(prompt = prompt, asset = asset, bank = bank, card = card, emi = emi, loan = loan, stock = stock)
 # END OF FILE
 # Path: src/services/ai.py
