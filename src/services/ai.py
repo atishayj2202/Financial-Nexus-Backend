@@ -42,6 +42,7 @@ model = genai.GenerativeModel(
 )
 
 def aimodel(prompt: str, asset: list, bank: list, card: list, emi: list, loan: list, stock: list):
+    
     if(len(bank)>0):
         bank_prompt = f"User has a bank account in {bank[0]['bank_name']} with Rs. {bank[0]['balance']} balance. He can refer this account by the name  {bank[0]['name']} "
         if(len(bank)>1):
