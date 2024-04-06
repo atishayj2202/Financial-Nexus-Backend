@@ -79,4 +79,3 @@ The option can be:
 - Atishaya Jain
 - Ajeem Ahmed
 - Khushal Bhasin
-- Rudr Pratap Singh
