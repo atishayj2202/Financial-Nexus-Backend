@@ -78,5 +78,5 @@ The option can be:
 ## Contributors
 - Atishaya Jain
 - Ajeem Ahmed
-- Khushal Bhasinprompt, asset, bank, card, emi, loan, stock
+- Khushal Bhasin
 - Rudr Pratap Singh
