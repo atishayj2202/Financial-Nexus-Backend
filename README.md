@@ -79,3 +79,5 @@ The option can be:
 - Atishaya Jain
 - Ajeem Ahmed
 - Khushal Bhasin
+- Swayam Singh
+- Rudr Pratap Singh
