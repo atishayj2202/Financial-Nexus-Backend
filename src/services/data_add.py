@@ -25,7 +25,8 @@ from src.schemas.investment import (
 from src.schemas.liability import CreateEMIRequest, CreateLoanRequest
 from src.schemas.user import MessageCreateRequest, MessageResponse
 from src.schemas.wallet import CreateBankRequest, CreateCreditCardRequest
-from src.services.ai import get_ai_reply
+from src.services.ai import aimodel
+from src.services.data_get import GetService
 from src.utils.enums import HolderType, MessageBy
 
 
@@ -319,7 +320,46 @@ class AddService:
         user: User,
         cockroach_client: CockroachDBClient,
     ) -> list[MessageResponse]:
-        response: str = get_ai_reply(request.message)
+        temps = GetService.get_banks(user=user, cockroach_client=cockroach_client)
+        bank_data: list[dict] = [
+            temp.dict(exclude={"id", "created_at", "disabled", "transactions"})
+            for temp in temps
+        ]
+        temps = GetService.get_cards(user=user, cockroach_client=cockroach_client)
+        card_data: list[dict] = [
+            temp.dict(exclude={"id", "created_at", "disabled", "transactions"})
+            for temp in temps
+        ]
+        temps = GetService.get_assets(user=user, cockroach_client=cockroach_client)
+        asset_data: list[dict] = [
+            temp.dict(exclude={"id", "created_at", "disabled", "transactions"})
+            for temp in temps
+        ]
+        temps = GetService.get_stocks(user=user, cockroach_client=cockroach_client)
+        stock_data: list[dict] = [
+            temp.dict(exclude={"id", "created_at", "disabled", "transactions"})
+            for temp in temps
+        ]
+        temps = GetService.get_loans(user=user, cockroach_client=cockroach_client)
+        loan_data: list[dict] = [
+            temp.dict(exclude={"id", "created_at", "disabled", "transactions"})
+            for temp in temps
+        ]
+        temps = GetService.get_emis(user=user, cockroach_client=cockroach_client)
+        emi_data: list[dict] = [
+            temp.dict(exclude={"id", "created_at", "disabled", "transactions"})
+            for temp in temps
+        ]
+
+        response: str = aimodel(
+            prompt=request.message,
+            asset=asset_data,
+            bank=bank_data,
+            card=card_data,
+            emi=emi_data,
+            loan=loan_data,
+            stock=stock_data,
+        )
         sender_message = Message(
             user_id=user.id, message=request.message, message_by=MessageBy.user
         )
