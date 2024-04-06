@@ -14,7 +14,7 @@ from src.routers.data_get import data_get_router
 from src.routers.user import user_router
 from src.utils.client import getCockroachClient, getFirebaseClient
 
-app = FastAPI(title="Financial Nexus Backend", version="0.1.3-dev1")
+app = FastAPI(title="Financial Nexus Backend", version="0.1.3-dev2")
 
 origins = os.environ["CORS_ORIGINS"].split(",")
 
